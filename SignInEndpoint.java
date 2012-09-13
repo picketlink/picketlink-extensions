@@ -86,12 +86,9 @@ public class SignInEndpoint {
         AuthenticationResponse response = new AuthenticationResponse();
         
         response.setUserId(authcRequest.getUserId());
+        response.setLoggedIn(this.identity.isLoggedIn());
         
-        boolean isLoggedIn = this.identity.isLoggedIn();
-        
-        response.setLoggedIn(isLoggedIn);
-        
-        if (isLoggedIn) {
+        if (response.isLoggedIn()) {
             PicketBoxUser user = (PicketBoxUser) this.identity.getUser();
             
             response.setToken(user.getSubject().getSession().getId().getId().toString());
