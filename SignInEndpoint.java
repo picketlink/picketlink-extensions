@@ -22,7 +22,9 @@
 
 package org.aerogear.todo.server.security.authc;
 
+import javax.annotation.PostConstruct;
 import javax.ejb.Stateless;
+import javax.ejb.TransactionAttribute;
 import javax.inject.Inject;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
@@ -33,6 +35,10 @@ import javax.ws.rs.core.MediaType;
 import org.jboss.picketlink.cdi.Identity;
 import org.jboss.picketlink.cdi.credential.Credential;
 import org.jboss.picketlink.cdi.credential.LoginCredentials;
+import org.jboss.picketlink.idm.IdentityManager;
+import org.jboss.picketlink.idm.model.Group;
+import org.jboss.picketlink.idm.model.Role;
+import org.jboss.picketlink.idm.model.User;
 import org.picketbox.cdi.PicketBoxUser;
 import org.picketbox.core.authentication.credential.UsernamePasswordCredential;
 
@@ -44,6 +50,7 @@ import org.picketbox.core.authentication.credential.UsernamePasswordCredential;
  */
 @Stateless
 @Path("/signin")
+@TransactionAttribute
 public class SignInEndpoint {
 
     @Inject
@@ -51,6 +58,32 @@ public class SignInEndpoint {
     
     @Inject
     private LoginCredentials credential;
+    
+    @Inject
+    private IdentityManager identityManager;
+    
+    /**
+     * <p>Loads some users during the first construction.</p>
+     */
+    @PostConstruct
+    public void loadUsers() {
+        User user = this.identityManager.createUser("abstractj");
+
+        user.setEmail("abstractj@aerogear.com");
+        user.setFirstName("Bruno");
+        user.setLastName("Oliveira");
+
+        user.setAttribute("password", "123");
+
+        Role roleDeveloper = this.identityManager.createRole("developer");
+        Role roleAdmin = this.identityManager.createRole("admin");
+
+        Group groupCoreDeveloper = identityManager.createGroup("Core Developers");
+
+        identityManager.grantRole(roleDeveloper, user, groupCoreDeveloper);
+        identityManager.grantRole(roleAdmin, user, groupCoreDeveloper);
+    }
+
     
     /**
      * <p>Performs the authentication using the informations provided by the {@link AuthenticationRequest}</p>
