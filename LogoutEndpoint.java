@@ -27,7 +27,6 @@ import javax.inject.Inject;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 
-import org.aerogear.todo.server.security.AuthenticationRequest;
 import org.jboss.picketlink.cdi.Identity;
 
 /**
