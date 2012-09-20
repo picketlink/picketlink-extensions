@@ -26,6 +26,7 @@ import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import javax.ejb.Stateless;
 import javax.inject.Inject;
@@ -38,10 +39,18 @@ import javax.ws.rs.Path;
 import javax.ws.rs.core.Context;
 
 import org.aerogear.todo.server.security.authc.fb.FacebookProcessor;
+import org.aerogear.todo.server.security.authc.oauth.oAuthCredential;
 import org.jboss.picketlink.cdi.Identity;
+import org.jboss.picketlink.cdi.credential.Credential;
+import org.jboss.picketlink.cdi.credential.LoginCredentials;
+import org.jboss.picketlink.idm.IdentityManager;
+import org.jboss.picketlink.idm.model.Group;
+import org.jboss.picketlink.idm.model.Role;
+import org.jboss.picketlink.idm.model.User;
 
 /**
  * Enables signin with facebook
+ * 
  * @author anil saldhana
  * @since Sep 19, 2012
  */
@@ -51,11 +60,16 @@ public class FacebookSignInEndpoint {
 
     @Resource
     ServletContext context;
-    
+
     @Inject
     private Identity identity;
-  
 
+    @Inject
+    private LoginCredentials credential;
+
+    @Inject
+    private IdentityManager identityManager;
+    
     private enum STATES {
         AUTH, AUTHZ, FINISH
     };
@@ -67,66 +81,109 @@ public class FacebookSignInEndpoint {
 
     protected List<String> roles = new ArrayList<String>();
     protected FacebookProcessor processor;
-    
-    public FacebookSignInEndpoint(){
+
+    public FacebookSignInEndpoint() {
         clientID = System.getProperty("FB_CLIENT_ID");
         clientSecret = System.getProperty("FB_CLIENT_SECRET");
         returnURL = System.getProperty("FB_RETURN_URL");
         roles.add("guest");
     }
     
-    
-    @GET
-    public boolean login(@Context HttpServletRequest request, @Context HttpServletResponse response) throws IOException{
-        HttpSession session = request.getSession();
-        String state = (String) session.getAttribute("STATE");
-        if (processor == null)
-            processor = new FacebookProcessor(clientID, clientSecret, scope, returnURL, roles);
+    /**
+     * <p>Loads some users during the first construction.</p>
+     */
+    @PostConstruct
+    public void loadUsers() {
+        User pedroigor = this.identityManager.createUser("Pedro Igor");
 
-        if (STATES.FINISH.name().equals(state)){
+        pedroigor.setEmail("pigor.craveiro@gmail.com");
+        pedroigor.setFirstName("Pedro");
+        pedroigor.setLastName("Igor");
+        
+        Role roleDeveloper = this.identityManager.createRole("developer");
+        Role roleAdmin = this.identityManager.createRole("admin");
+
+        Group groupCoreDeveloper = identityManager.createGroup("Core Developers");
+
+        identityManager.grantRole(roleDeveloper, pedroigor, groupCoreDeveloper);
+        identityManager.grantRole(roleAdmin, pedroigor, groupCoreDeveloper);
+    }
+
+    @GET
+    public boolean login(@Context final HttpServletRequest request, @Context final HttpServletResponse response) throws IOException {
+        if (this.identity.isLoggedIn()) {
             return true;
         }
         
-        if (state == null || state.isEmpty()) {
-            /*if (saveRestoreRequest) {
-                this.saveRequest(request, request.getSessionInternal());
-            }*/
-            return  processor.initialInteraction(request, response);
-        }
-        // We have sent an auth request
-        if (state.equals(STATES.AUTH.name())) {
-            return  processor.handleAuthStage(request, response);
-        }
+        this.credential.setCredential(new Credential<oAuthCredential>() {
 
-        // Principal facebookPrincipal = null;
-        if (state.equals(STATES.AUTHZ.name())) {
-            Principal principal = processor.getPrincipal(request, response);
-
-            if (principal == null) {
-                //log.error("Principal was null. Maybe login modules need to be configured properly.");
-                response.sendError(HttpServletResponse.SC_FORBIDDEN);
-                return false;
+            @Override
+            public oAuthCredential getValue() {
+                oAuthCredential oAuthCredential = new oAuthCredential();
+                
+                oAuthCredential.setRequest(request);
+                oAuthCredential.setResponse(response);
+                
+                return oAuthCredential;
             }
-             
-            session.setAttribute("PRINCIPAL", principal);
- 
-            session.setAttribute("STATE", STATES.FINISH.name());            
-
-            return true;
-        }
-        return false;
+        });
+        
+        this.identity.login();
+        
+        return this.identity.isLoggedIn();
     }
-    
-    private String getUserName(HttpServletRequest request){
+
+    // @GET
+    // public boolean login(@Context HttpServletRequest request, @Context HttpServletResponse response) throws IOException{
+    // HttpSession session = request.getSession();
+    // String state = (String) session.getAttribute("STATE");
+    // if (processor == null)
+    // processor = new FacebookProcessor(clientID, clientSecret, scope, returnURL, roles);
+    //
+    // if (STATES.FINISH.name().equals(state)){
+    // return true;
+    // }
+    //
+    // if (state == null || state.isEmpty()) {
+    // /*if (saveRestoreRequest) {
+    // this.saveRequest(request, request.getSessionInternal());
+    // }*/
+    // return processor.initialInteraction(request, response);
+    // }
+    // // We have sent an auth request
+    // if (state.equals(STATES.AUTH.name())) {
+    // return processor.handleAuthStage(request, response);
+    // }
+    //
+    // // Principal facebookPrincipal = null;
+    // if (state.equals(STATES.AUTHZ.name())) {
+    // Principal principal = processor.getPrincipal(request, response);
+    //
+    // if (principal == null) {
+    // //log.error("Principal was null. Maybe login modules need to be configured properly.");
+    // response.sendError(HttpServletResponse.SC_FORBIDDEN);
+    // return false;
+    // }
+    //
+    // session.setAttribute("PRINCIPAL", principal);
+    //
+    // session.setAttribute("STATE", STATES.FINISH.name());
+    //
+    // return true;
+    // }
+    // return false;
+    // }
+
+    private String getUserName(HttpServletRequest request) {
         HttpSession session = request.getSession();
         Principal principal = (Principal) session.getAttribute("PRINCIPAL");
-        if(principal != null){
+        if (principal != null) {
             return principal.getName();
         }
         return null;
     }
-    
-    private AuthenticationResponse success(HttpServletRequest request){
+
+    private AuthenticationResponse success(HttpServletRequest request) {
         AuthenticationResponse response = new AuthenticationResponse();
         response.setLoggedIn(true);
         response.setToken(getUserName(request));

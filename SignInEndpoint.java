@@ -111,7 +111,6 @@ public class SignInEndpoint {
             return createResponse(authcRequest);
         }
         
-        credential.setUserId(authcRequest.getUserId());
         credential.setCredential(new Credential<UsernamePasswordCredential>() {
 
             @Override
