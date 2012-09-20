@@ -33,7 +33,6 @@ import javax.servlet.http.HttpSession;
 
 import org.aerogear.todo.server.security.authc.fb.FacebookProcessor;
 import org.picketbox.core.Credential;
-import org.picketbox.core.PicketBoxPrincipal;
 import org.picketbox.core.authentication.AuthenticationInfo;
 import org.picketbox.core.authentication.AuthenticationManager;
 import org.picketbox.core.authentication.AuthenticationResult;
@@ -41,10 +40,10 @@ import org.picketbox.core.authentication.impl.AbstractAuthenticationMechanism;
 import org.picketbox.core.exceptions.AuthenticationException;
 
 /**
- * @author <a href="mailto:psilva@redhat.com">Pedro Silva</a>
- * 
+ * @author Anil Saldhana
+ * @author Pedro Silva
  */
-public class OAuthAuthenticationMechanism extends AbstractAuthenticationMechanism {
+public class FacebookAuthenticationMechanism extends AbstractAuthenticationMechanism {
 
     protected String returnURL;
     protected String clientID;
@@ -54,7 +53,7 @@ public class OAuthAuthenticationMechanism extends AbstractAuthenticationMechanis
     protected List<String> roles = new ArrayList<String>();
     protected FacebookProcessor processor;
 
-    public OAuthAuthenticationMechanism() {
+    public FacebookAuthenticationMechanism() {
         clientID = System.getProperty("FB_CLIENT_ID");
         clientSecret = System.getProperty("FB_CLIENT_SECRET");
         returnURL = System.getProperty("FB_RETURN_URL");
@@ -105,6 +104,9 @@ public class OAuthAuthenticationMechanism extends AbstractAuthenticationMechanis
             Principal principal = processor.getPrincipal(request, response);
 
             if (principal != null) {
+
+                session.setAttribute("PRINCIPAL", principal);
+                session.removeAttribute("STATE");
                 return principal;
             }
 

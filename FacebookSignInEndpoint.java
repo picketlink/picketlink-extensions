@@ -35,8 +35,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
 
 import org.aerogear.todo.server.security.authc.fb.FacebookProcessor;
 import org.aerogear.todo.server.security.authc.oauth.oAuthCredential;
@@ -107,6 +110,15 @@ public class FacebookSignInEndpoint {
 
         identityManager.grantRole(roleDeveloper, pedroigor, groupCoreDeveloper);
         identityManager.grantRole(roleAdmin, pedroigor, groupCoreDeveloper);
+        
+
+        User anilsa = this.identityManager.createUser("Anil Sa");
+ 
+        anilsa.setFirstName("Anil");
+        anilsa.setLastName("Sa"); 
+
+        identityManager.grantRole(roleDeveloper, anilsa, groupCoreDeveloper);
+        identityManager.grantRole(roleAdmin, anilsa, groupCoreDeveloper);
     }
 
     @GET
@@ -130,7 +142,37 @@ public class FacebookSignInEndpoint {
         
         this.identity.login();
         
-        return this.identity.isLoggedIn();
+        boolean result = this.identity.isLoggedIn();
+        if(result == true){
+            //Check if the user exists in DB
+            User user = identity.getUser();
+            User storedUser = identityManager.getUser(user.getId());
+            
+            if(storedUser == null){
+                User newUser = identityManager.createUser(user.getId());
+                newUser.setFirstName(user.getId());
+
+                Role guest = this.identityManager.createRole("guest");
+                Group guests = identityManager.createGroup("Guests");
+
+                identityManager.grantRole(guest, newUser, guests);
+            }
+            System.out.println(user);
+        }
+        return result;
+    }
+    
+    @POST
+    @Produces(MediaType.APPLICATION_JSON)
+    public AuthenticationResponse getStatus(@Context HttpServletRequest request, @Context HttpServletResponse response) throws IOException{
+        if(identity.isLoggedIn()){
+            User user = identity.getUser();
+            AuthenticationResponse authResponse = new AuthenticationResponse();
+            authResponse.setLoggedIn(true);
+            authResponse.setToken(user.getId());
+            return authResponse;
+        }
+        return null;
     }
 
     // @GET
