@@ -122,9 +122,9 @@ public class FacebookSignInEndpoint {
     }
 
     @GET
-    public boolean login(@Context final HttpServletRequest request, @Context final HttpServletResponse response) throws IOException {
+    public String login(@Context final HttpServletRequest request, @Context final HttpServletResponse response) throws IOException {
         if (this.identity.isLoggedIn()) {
-            return true;
+            return null;
         }
         
         this.credential.setCredential(new Credential<oAuthCredential>() {
@@ -143,7 +143,8 @@ public class FacebookSignInEndpoint {
         this.identity.login();
         
         boolean result = this.identity.isLoggedIn();
-        if(result == true){
+        
+        if(result){
             //Check if the user exists in DB
             User user = identity.getUser();
             User storedUser = identityManager.getUser(user.getId());
@@ -157,9 +158,19 @@ public class FacebookSignInEndpoint {
 
                 identityManager.grantRole(guest, newUser, guests);
             }
-            System.out.println(user);
+            
+            return "<script>window.opener.sendMainPage();</script>";
         }
-        return result;
+        
+        return null;
+    }
+
+    private AuthenticationResponse createSuccessfulAuthResponse() {
+        AuthenticationResponse response = new AuthenticationResponse();
+        
+        response.setLoggedIn(this.identity.isLoggedIn());
+        
+        return response;
     }
     
     @POST
@@ -167,7 +178,7 @@ public class FacebookSignInEndpoint {
     public AuthenticationResponse getStatus(@Context HttpServletRequest request, @Context HttpServletResponse response) throws IOException{
         if(identity.isLoggedIn()){
             User user = identity.getUser();
-            AuthenticationResponse authResponse = new AuthenticationResponse();
+            AuthenticationResponse authResponse = createSuccessfulAuthResponse();
             authResponse.setLoggedIn(true);
             authResponse.setToken(user.getId());
             return authResponse;
@@ -226,7 +237,7 @@ public class FacebookSignInEndpoint {
     }
 
     private AuthenticationResponse success(HttpServletRequest request) {
-        AuthenticationResponse response = new AuthenticationResponse();
+        AuthenticationResponse response = createSuccessfulAuthResponse();
         response.setLoggedIn(true);
         response.setToken(getUserName(request));
         return response;
