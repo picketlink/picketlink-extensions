@@ -20,18 +20,22 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-package org.aerogear.todo.server.security.authc.oauth;
+package org.aerogear.todo.server.security.authc.fb;
 
 import java.io.IOException;
 import java.security.Principal;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.aerogear.todo.server.security.authc.fb.FacebookProcessor;
+import org.jboss.picketlink.idm.IdentityManager;
+import org.jboss.picketlink.idm.model.Group;
+import org.jboss.picketlink.idm.model.Role;
+import org.jboss.picketlink.idm.model.User;
 import org.picketbox.core.Credential;
 import org.picketbox.core.authentication.AuthenticationInfo;
 import org.picketbox.core.authentication.AuthenticationManager;
@@ -40,6 +44,7 @@ import org.picketbox.core.authentication.impl.AbstractAuthenticationMechanism;
 import org.picketbox.core.exceptions.AuthenticationException;
 
 /**
+ * An authentication mechanism for Facebook SignIn
  * @author Anil Saldhana
  * @author Pedro Silva
  */
@@ -52,6 +57,8 @@ public class FacebookAuthenticationMechanism extends AbstractAuthenticationMecha
 
     protected List<String> roles = new ArrayList<String>();
     protected FacebookProcessor processor;
+    
+    protected IdentityManager identityManager;
 
     public FacebookAuthenticationMechanism() {
         clientID = System.getProperty("FB_CLIENT_ID");
@@ -62,13 +69,30 @@ public class FacebookAuthenticationMechanism extends AbstractAuthenticationMecha
     
     private enum STATES {
         AUTH, AUTHZ, FINISH
-    };
+    }; 
+
+    public IdentityManager getIdentityManager() {
+        return identityManager;
+    }
+
+    public void setIdentityManager(IdentityManager identityManager) {
+        this.identityManager = identityManager;
+    }
+
+    
+    public List<String> getRoles() {
+        return Collections.unmodifiableList(roles);
+    }
+
+    public void setRoles(List<String> roles) {
+        this.roles.addAll(roles);
+    }
 
     @Override
     public List<AuthenticationInfo> getAuthenticationInfo() {
         ArrayList<AuthenticationInfo> info = new ArrayList<AuthenticationInfo>();
 
-        info.add(new AuthenticationInfo("oAuth Authentication", "Provides oAuth authentication.", oAuthCredential.class));
+        info.add(new AuthenticationInfo("oAuth Authentication", "Provides oAuth authentication.", FacebookCredentialCredential.class));
 
         return info;
     }
@@ -76,7 +100,7 @@ public class FacebookAuthenticationMechanism extends AbstractAuthenticationMecha
     @Override
     protected Principal doAuthenticate(AuthenticationManager authenticationManager, Credential credential,
             AuthenticationResult result) throws AuthenticationException {
-        oAuthCredential oAuthCredential = (org.aerogear.todo.server.security.authc.oauth.oAuthCredential) credential;
+        FacebookCredentialCredential oAuthCredential = (org.aerogear.todo.server.security.authc.fb.FacebookCredentialCredential) credential;
         HttpServletRequest request = oAuthCredential.getRequest();
         HttpServletResponse response = oAuthCredential.getResponse();
         
@@ -87,9 +111,9 @@ public class FacebookAuthenticationMechanism extends AbstractAuthenticationMecha
 
         if (state == null || state.isEmpty()) {
             try {
-                boolean initialInteraction = processor.initialInteraction(request, response);
+                processor.initialInteraction(request, response);
             } catch (IOException e) {
-                e.printStackTrace();
+                throw new RuntimeException(e);
             }
             return null;
         }
@@ -104,9 +128,9 @@ public class FacebookAuthenticationMechanism extends AbstractAuthenticationMecha
             Principal principal = processor.getPrincipal(request, response);
 
             if (principal != null) {
-
                 session.setAttribute("PRINCIPAL", principal);
                 session.removeAttribute("STATE");
+                checkUserInStore((FacebookPrincipal) principal);
                 return principal;
             }
 
@@ -116,5 +140,21 @@ public class FacebookAuthenticationMechanism extends AbstractAuthenticationMecha
         }
         return null;
     }
+    
+    private void checkUserInStore(FacebookPrincipal principal){
+        if(identityManager != null){
+            User storedUser = identityManager.getUser(principal.getName());
+            if(storedUser == null){
+                User newUser = identityManager.createUser(principal.getName());
+                newUser.setFirstName(principal.getFirstName());
+                newUser.setLastName(principal.getLastName());
+                newUser.setEmail(principal.getEmail());
 
+                Role guest = this.identityManager.createRole("guest");
+                Group guests = identityManager.createGroup("Guests");
+
+                identityManager.grantRole(guest, newUser, guests);
+            }
+        }
+    }
 }

@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-package org.aerogear.todo.server.security.authc.oauth;
+package org.aerogear.todo.server.security.authc.fb;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -31,7 +31,7 @@ import org.picketbox.core.AbstractCredential;
  * @author <a href="mailto:psilva@redhat.com">Pedro Silva</a>
  *
  */
-public class oAuthCredential extends AbstractCredential {
+public class FacebookCredentialCredential extends AbstractCredential {
 
     private HttpServletRequest request;
     private HttpServletResponse response;
