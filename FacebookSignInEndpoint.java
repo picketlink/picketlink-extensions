@@ -66,7 +66,7 @@ public class FacebookSignInEndpoint {
 
     @Inject
     private IdentityManager identityManager;
-    
+
     @GET
     public String login(@Context final HttpServletRequest request, @Context final HttpServletResponse response) throws IOException {
         if (this.identity.isLoggedIn()) {
@@ -153,5 +153,4 @@ public class FacebookSignInEndpoint {
         }
         return null;
     }
-
 }

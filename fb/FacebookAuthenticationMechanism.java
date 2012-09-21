@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-package org.aerogear.todo.server.security.authc.oauth;
+package org.aerogear.todo.server.security.authc.fb;
 
 import java.io.IOException;
 import java.security.Principal;
@@ -32,17 +32,20 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.aerogear.todo.server.security.authc.fb.FacebookProcessor;
+import org.aerogear.todo.server.security.authc.oauth.FacebookCredential;
+import org.jboss.picketlink.idm.IdentityManager;
+import org.jboss.picketlink.idm.model.Group;
+import org.jboss.picketlink.idm.model.Role;
+import org.jboss.picketlink.idm.model.User;
 import org.picketbox.core.Credential;
 import org.picketbox.core.authentication.AuthenticationInfo;
 import org.picketbox.core.authentication.AuthenticationManager;
-import org.picketbox.core.authentication.AuthenticationMechanism;
 import org.picketbox.core.authentication.AuthenticationResult;
 import org.picketbox.core.authentication.impl.AbstractAuthenticationMechanism;
 import org.picketbox.core.exceptions.AuthenticationException;
 
 /**
- * <p> {@link AuthenticationMechanism} implementation that handles Facebook oAuth authentication.</p>
+ * An authentication mechanism for Facebook SignIn
  * 
  * @author Anil Saldhana
  * @author Pedro Silva
@@ -56,6 +59,8 @@ public class FacebookAuthenticationMechanism extends AbstractAuthenticationMecha
     protected String scope = "email";
 
     protected FacebookProcessor processor;
+    
+    protected IdentityManager identityManager;
 
     public FacebookAuthenticationMechanism() {
         clientID = System.getProperty("FB_CLIENT_ID");
@@ -65,8 +70,17 @@ public class FacebookAuthenticationMechanism extends AbstractAuthenticationMecha
     
     private enum STATES {
         AUTH, AUTHZ, FINISH
-    };
+    }; 
 
+    public IdentityManager getIdentityManager() {
+        return identityManager;
+    }
+
+    public void setIdentityManager(IdentityManager identityManager) {
+        this.identityManager = identityManager;
+    }
+
+    
     @Override
     public List<AuthenticationInfo> getAuthenticationInfo() {
         ArrayList<AuthenticationInfo> info = new ArrayList<AuthenticationInfo>();
@@ -101,6 +115,7 @@ public class FacebookAuthenticationMechanism extends AbstractAuthenticationMecha
         } else if (isAuthorizationInteraction(session)) {
             session.removeAttribute(FB_AUTH_STATE_SESSION_ATTRIBUTE);
             principal = getFacebookProcessor().getPrincipal(request, response);
+            checkUserInStore((FacebookPrincipal) principal);
         }
         
         return principal;
@@ -129,5 +144,21 @@ public class FacebookAuthenticationMechanism extends AbstractAuthenticationMecha
         }
         return this.processor;
     }
+    
+    private void checkUserInStore(FacebookPrincipal principal){
+        if(identityManager != null){
+            User storedUser = identityManager.getUser(principal.getName());
+            if(storedUser == null){
+                User newUser = identityManager.createUser(principal.getName());
+                newUser.setFirstName(principal.getFirstName());
+                newUser.setLastName(principal.getLastName());
+                newUser.setEmail(principal.getEmail());
 
+                Role guest = this.identityManager.createRole("guest");
+                Group guests = identityManager.createGroup("Guests");
+
+                identityManager.grantRole(guest, newUser, guests);
+            }
+        }
+    }
 }
