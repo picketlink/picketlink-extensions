@@ -22,18 +22,12 @@
 package org.aerogear.todo.server.security.authc;
 
 import java.io.IOException;
-import java.security.Principal;
 import java.util.ArrayList;
-import java.util.List;
 
-import javax.annotation.PostConstruct;
-import javax.annotation.Resource;
 import javax.ejb.Stateless;
 import javax.inject.Inject;
-import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -41,7 +35,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 
-import org.aerogear.todo.server.security.authc.fb.FacebookProcessor;
+import org.aerogear.todo.server.security.authc.fb.FacebookPrincipal;
 import org.aerogear.todo.server.security.authc.oauth.oAuthCredential;
 import org.jboss.picketlink.cdi.Identity;
 import org.jboss.picketlink.cdi.credential.Credential;
@@ -50,6 +44,9 @@ import org.jboss.picketlink.idm.IdentityManager;
 import org.jboss.picketlink.idm.model.Group;
 import org.jboss.picketlink.idm.model.Role;
 import org.jboss.picketlink.idm.model.User;
+import org.picketbox.cdi.PicketBoxCDISubject;
+import org.picketbox.cdi.PicketBoxUser;
+import org.picketbox.core.PicketBoxSubject;
 
 /**
  * Enables signin with facebook
@@ -61,9 +58,6 @@ import org.jboss.picketlink.idm.model.User;
 @Path("/facebook")
 public class FacebookSignInEndpoint {
 
-    @Resource
-    ServletContext context;
-
     @Inject
     private Identity identity;
 
@@ -73,54 +67,6 @@ public class FacebookSignInEndpoint {
     @Inject
     private IdentityManager identityManager;
     
-    private enum STATES {
-        AUTH, AUTHZ, FINISH
-    };
-
-    protected String returnURL;
-    protected String clientID;
-    protected String clientSecret;
-    protected String scope = "email";
-
-    protected List<String> roles = new ArrayList<String>();
-    protected FacebookProcessor processor;
-
-    public FacebookSignInEndpoint() {
-        clientID = System.getProperty("FB_CLIENT_ID");
-        clientSecret = System.getProperty("FB_CLIENT_SECRET");
-        returnURL = System.getProperty("FB_RETURN_URL");
-        roles.add("guest");
-    }
-    
-    /**
-     * <p>Loads some users during the first construction.</p>
-     */
-    @PostConstruct
-    public void loadUsers() {
-        User pedroigor = this.identityManager.createUser("Pedro Igor");
-
-        pedroigor.setEmail("pigor.craveiro@gmail.com");
-        pedroigor.setFirstName("Pedro");
-        pedroigor.setLastName("Igor");
-        
-        Role roleDeveloper = this.identityManager.createRole("developer");
-        Role roleAdmin = this.identityManager.createRole("admin");
-
-        Group groupCoreDeveloper = identityManager.createGroup("Core Developers");
-
-        identityManager.grantRole(roleDeveloper, pedroigor, groupCoreDeveloper);
-        identityManager.grantRole(roleAdmin, pedroigor, groupCoreDeveloper);
-        
-
-        User anilsa = this.identityManager.createUser("Anil Sa");
- 
-        anilsa.setFirstName("Anil");
-        anilsa.setLastName("Sa"); 
-
-        identityManager.grantRole(roleDeveloper, anilsa, groupCoreDeveloper);
-        identityManager.grantRole(roleAdmin, anilsa, groupCoreDeveloper);
-    }
-
     @GET
     public String login(@Context final HttpServletRequest request, @Context final HttpServletResponse response) throws IOException {
         if (this.identity.isLoggedIn()) {
@@ -131,38 +77,60 @@ public class FacebookSignInEndpoint {
 
             @Override
             public oAuthCredential getValue() {
-                oAuthCredential oAuthCredential = new oAuthCredential();
-                
-                oAuthCredential.setRequest(request);
-                oAuthCredential.setResponse(response);
-                
-                return oAuthCredential;
+                return new oAuthCredential(request, response);
             }
         });
         
         this.identity.login();
         
-        boolean result = this.identity.isLoggedIn();
-        
-        if(result){
-            //Check if the user exists in DB
-            User user = identity.getUser();
-            User storedUser = identityManager.getUser(user.getId());
-            
-            if(storedUser == null){
-                User newUser = identityManager.createUser(user.getId());
-                newUser.setFirstName(user.getId());
-
-                Role guest = this.identityManager.createRole("guest");
-                Group guests = identityManager.createGroup("Guests");
-
-                identityManager.grantRole(guest, newUser, guests);
-            }
-            
+        if (this.identity.isLoggedIn()) {
+            provisionNewUser();
             return "<script>window.opener.sendMainPage();</script>";
         }
         
         return null;
+    }
+
+    /**
+     * <p>Provision the authenticated user if he is not stored yes.</p>
+     * 
+     * TODO: user provisioning feature should be provided by PicketBox ? 
+     */
+    private void provisionNewUser() {
+        FacebookPrincipal principal = getAuthenticatedPrincipal();
+        
+        //Check if the user exists in DB
+        User storedUser = identityManager.getUser(principal.getName());
+        ArrayList<String> roles = new ArrayList<String>();
+        
+        if(storedUser == null) {
+            storedUser = identityManager.createUser(principal.getEmail());
+            storedUser.setFirstName(principal.getFirstName());
+            storedUser.setLastName(principal.getLastName());
+
+            Role guest = this.identityManager.createRole("guest");
+            
+            roles.add(guest.getName());
+            
+            Group guests = identityManager.createGroup("Guests");
+
+            identityManager.grantRole(guest, storedUser, guests);
+            
+            // necessary because we need to show the user info at the main page. Otherwise the informations will be show only after the second login.
+            PicketBoxUser user = (PicketBoxUser) identity.getUser();
+            PicketBoxCDISubject subject = user.getSubject();
+            
+            subject.setIdmUser(storedUser);
+            
+            subject.setRoleNames(roles);
+        }
+    }
+
+    private FacebookPrincipal getAuthenticatedPrincipal() {
+        PicketBoxUser user = (PicketBoxUser) identity.getUser();
+        PicketBoxSubject subject = user.getSubject();
+        
+        return (FacebookPrincipal) subject.getUser();
     }
 
     private AuthenticationResponse createSuccessfulAuthResponse() {
@@ -186,60 +154,4 @@ public class FacebookSignInEndpoint {
         return null;
     }
 
-    // @GET
-    // public boolean login(@Context HttpServletRequest request, @Context HttpServletResponse response) throws IOException{
-    // HttpSession session = request.getSession();
-    // String state = (String) session.getAttribute("STATE");
-    // if (processor == null)
-    // processor = new FacebookProcessor(clientID, clientSecret, scope, returnURL, roles);
-    //
-    // if (STATES.FINISH.name().equals(state)){
-    // return true;
-    // }
-    //
-    // if (state == null || state.isEmpty()) {
-    // /*if (saveRestoreRequest) {
-    // this.saveRequest(request, request.getSessionInternal());
-    // }*/
-    // return processor.initialInteraction(request, response);
-    // }
-    // // We have sent an auth request
-    // if (state.equals(STATES.AUTH.name())) {
-    // return processor.handleAuthStage(request, response);
-    // }
-    //
-    // // Principal facebookPrincipal = null;
-    // if (state.equals(STATES.AUTHZ.name())) {
-    // Principal principal = processor.getPrincipal(request, response);
-    //
-    // if (principal == null) {
-    // //log.error("Principal was null. Maybe login modules need to be configured properly.");
-    // response.sendError(HttpServletResponse.SC_FORBIDDEN);
-    // return false;
-    // }
-    //
-    // session.setAttribute("PRINCIPAL", principal);
-    //
-    // session.setAttribute("STATE", STATES.FINISH.name());
-    //
-    // return true;
-    // }
-    // return false;
-    // }
-
-    private String getUserName(HttpServletRequest request) {
-        HttpSession session = request.getSession();
-        Principal principal = (Principal) session.getAttribute("PRINCIPAL");
-        if (principal != null) {
-            return principal.getName();
-        }
-        return null;
-    }
-
-    private AuthenticationResponse success(HttpServletRequest request) {
-        AuthenticationResponse response = createSuccessfulAuthResponse();
-        response.setLoggedIn(true);
-        response.setToken(getUserName(request));
-        return response;
-    }
 }

@@ -36,6 +36,11 @@ public class oAuthCredential extends AbstractCredential {
     private HttpServletRequest request;
     private HttpServletResponse response;
 
+    public oAuthCredential(HttpServletRequest request, HttpServletResponse response) {
+        this.request = request;
+        this.response = response;
+    }
+    
     /**
      * @return the request
      */

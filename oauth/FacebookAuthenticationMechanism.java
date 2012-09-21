@@ -25,6 +25,7 @@ package org.aerogear.todo.server.security.authc.oauth;
 import java.io.IOException;
 import java.security.Principal;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -35,11 +36,14 @@ import org.aerogear.todo.server.security.authc.fb.FacebookProcessor;
 import org.picketbox.core.Credential;
 import org.picketbox.core.authentication.AuthenticationInfo;
 import org.picketbox.core.authentication.AuthenticationManager;
+import org.picketbox.core.authentication.AuthenticationMechanism;
 import org.picketbox.core.authentication.AuthenticationResult;
 import org.picketbox.core.authentication.impl.AbstractAuthenticationMechanism;
 import org.picketbox.core.exceptions.AuthenticationException;
 
 /**
+ * <p> {@link AuthenticationMechanism} implementation that handles Facebook oAuth authentication.</p>
+ * 
  * @author Anil Saldhana
  * @author Pedro Silva
  */
@@ -50,14 +54,12 @@ public class FacebookAuthenticationMechanism extends AbstractAuthenticationMecha
     protected String clientSecret;
     protected String scope = "email";
 
-    protected List<String> roles = new ArrayList<String>();
     protected FacebookProcessor processor;
 
     public FacebookAuthenticationMechanism() {
         clientID = System.getProperty("FB_CLIENT_ID");
         clientSecret = System.getProperty("FB_CLIENT_SECRET");
         returnURL = System.getProperty("FB_RETURN_URL");
-        roles.add("guest");
     }
     
     private enum STATES {
@@ -73,48 +75,57 @@ public class FacebookAuthenticationMechanism extends AbstractAuthenticationMecha
         return info;
     }
 
+    /* (non-Javadoc)
+     * @see org.picketbox.core.authentication.impl.AbstractAuthenticationMechanism#doAuthenticate(org.picketbox.core.authentication.AuthenticationManager, org.picketbox.core.Credential, org.picketbox.core.authentication.AuthenticationResult)
+     */
     @Override
     protected Principal doAuthenticate(AuthenticationManager authenticationManager, Credential credential,
             AuthenticationResult result) throws AuthenticationException {
         oAuthCredential oAuthCredential = (org.aerogear.todo.server.security.authc.oauth.oAuthCredential) credential;
+        
         HttpServletRequest request = oAuthCredential.getRequest();
         HttpServletResponse response = oAuthCredential.getResponse();
-        
         HttpSession session = request.getSession();
-        String state = (String) session.getAttribute("STATE");
-        if (processor == null)
-            processor = new FacebookProcessor(clientID, clientSecret, scope, returnURL, roles);
 
-        if (state == null || state.isEmpty()) {
+        Principal principal = null;
+        
+        if (isFirstInteraction(session)) {
             try {
-                boolean initialInteraction = processor.initialInteraction(request, response);
+                getFacebookProcessor().initialInteraction(request, response);
             } catch (IOException e) {
-                e.printStackTrace();
+                throw new AuthenticationException("Error while initiating Facebook authentication interaction.", e);
             }
-            return null;
-        }
-        // We have sent an auth request
-        if (state.equals(STATES.AUTH.name())) {
-            processor.handleAuthStage(request, response);
-            return null;
-        }
-
-        // Principal facebookPrincipal = null;
-        if (state.equals(STATES.AUTHZ.name())) {
-            Principal principal = processor.getPrincipal(request, response);
-
-            if (principal != null) {
-
-                session.setAttribute("PRINCIPAL", principal);
-                session.removeAttribute("STATE");
-                return principal;
-            }
-
-            session.setAttribute("PRINCIPAL", principal);
-
+        } else if (isAuthenticationInteraction(session)) {
+            getFacebookProcessor().handleAuthStage(request, response);
+        } else if (isAuthorizationInteraction(session)) {
             session.removeAttribute("STATE");
+            principal = getFacebookProcessor().getPrincipal(request, response);
         }
-        return null;
+        
+        return principal;
+    }
+
+    private boolean isAuthorizationInteraction(HttpSession session) {
+        return getCurrentAuthenticationState(session).equals(STATES.AUTHZ.name());
+    }
+
+    private boolean isAuthenticationInteraction(HttpSession session) {
+        return getCurrentAuthenticationState(session).equals(STATES.AUTH.name());
+    }
+
+    private boolean isFirstInteraction(HttpSession session) {
+        return getCurrentAuthenticationState(session) == null || getCurrentAuthenticationState(session).isEmpty();
+    }
+
+    private String getCurrentAuthenticationState(HttpSession session) {
+        return (String) session.getAttribute("STATE");
+    }
+
+    private FacebookProcessor getFacebookProcessor() {
+        if (this.processor == null) {
+            this.processor = new FacebookProcessor(clientID, clientSecret, scope, returnURL, Collections.EMPTY_LIST);
+        }
+        return this.processor;
     }
 
 }

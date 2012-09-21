@@ -222,6 +222,7 @@ public class FacebookProcessor {
             facebookPrincipal.setTimezone(jsonObject.getString("timezone"));
             facebookPrincipal.setLocale(jsonObject.getString("locale"));
             if (jsonObject.getString("email") != null) {
+                facebookPrincipal.setName(jsonObject.getString("email"));
                 facebookPrincipal.setEmail(jsonObject.getString("email"));
             }
         } catch (JSONException e) {
