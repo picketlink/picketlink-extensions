@@ -49,6 +49,7 @@ import org.picketbox.core.exceptions.AuthenticationException;
  */
 public class FacebookAuthenticationMechanism extends AbstractAuthenticationMechanism {
 
+    private static final String FB_AUTH_STATE_SESSION_ATTRIBUTE = "FB_AUTH_STATE_SESSION_ATTRIBUTE";
     protected String returnURL;
     protected String clientID;
     protected String clientSecret;
@@ -70,7 +71,7 @@ public class FacebookAuthenticationMechanism extends AbstractAuthenticationMecha
     public List<AuthenticationInfo> getAuthenticationInfo() {
         ArrayList<AuthenticationInfo> info = new ArrayList<AuthenticationInfo>();
 
-        info.add(new AuthenticationInfo("oAuth Authentication", "Provides oAuth authentication.", oAuthCredential.class));
+        info.add(new AuthenticationInfo("oAuth Authentication", "Provides oAuth authentication.", FacebookCredential.class));
 
         return info;
     }
@@ -81,7 +82,7 @@ public class FacebookAuthenticationMechanism extends AbstractAuthenticationMecha
     @Override
     protected Principal doAuthenticate(AuthenticationManager authenticationManager, Credential credential,
             AuthenticationResult result) throws AuthenticationException {
-        oAuthCredential oAuthCredential = (org.aerogear.todo.server.security.authc.oauth.oAuthCredential) credential;
+        FacebookCredential oAuthCredential = (org.aerogear.todo.server.security.authc.oauth.FacebookCredential) credential;
         
         HttpServletRequest request = oAuthCredential.getRequest();
         HttpServletResponse response = oAuthCredential.getResponse();
@@ -98,7 +99,7 @@ public class FacebookAuthenticationMechanism extends AbstractAuthenticationMecha
         } else if (isAuthenticationInteraction(session)) {
             getFacebookProcessor().handleAuthStage(request, response);
         } else if (isAuthorizationInteraction(session)) {
-            session.removeAttribute("STATE");
+            session.removeAttribute(FB_AUTH_STATE_SESSION_ATTRIBUTE);
             principal = getFacebookProcessor().getPrincipal(request, response);
         }
         
@@ -118,9 +119,10 @@ public class FacebookAuthenticationMechanism extends AbstractAuthenticationMecha
     }
 
     private String getCurrentAuthenticationState(HttpSession session) {
-        return (String) session.getAttribute("STATE");
+        return (String) session.getAttribute(FB_AUTH_STATE_SESSION_ATTRIBUTE);
     }
 
+    @SuppressWarnings("unchecked")
     private FacebookProcessor getFacebookProcessor() {
         if (this.processor == null) {
             this.processor = new FacebookProcessor(clientID, clientSecret, scope, returnURL, Collections.EMPTY_LIST);

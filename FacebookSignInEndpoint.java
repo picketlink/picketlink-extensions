@@ -36,7 +36,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 
 import org.aerogear.todo.server.security.authc.fb.FacebookPrincipal;
-import org.aerogear.todo.server.security.authc.oauth.oAuthCredential;
+import org.aerogear.todo.server.security.authc.oauth.FacebookCredential;
 import org.jboss.picketlink.cdi.Identity;
 import org.jboss.picketlink.cdi.credential.Credential;
 import org.jboss.picketlink.cdi.credential.LoginCredentials;
@@ -73,11 +73,11 @@ public class FacebookSignInEndpoint {
             return null;
         }
         
-        this.credential.setCredential(new Credential<oAuthCredential>() {
+        this.credential.setCredential(new Credential<FacebookCredential>() {
 
             @Override
-            public oAuthCredential getValue() {
-                return new oAuthCredential(request, response);
+            public FacebookCredential getValue() {
+                return new FacebookCredential(request, response);
             }
         });
         

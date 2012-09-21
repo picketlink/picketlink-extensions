@@ -31,12 +31,12 @@ import org.picketbox.core.AbstractCredential;
  * @author <a href="mailto:psilva@redhat.com">Pedro Silva</a>
  *
  */
-public class oAuthCredential extends AbstractCredential {
+public class FacebookCredential extends AbstractCredential {
 
     private HttpServletRequest request;
     private HttpServletResponse response;
 
-    public oAuthCredential(HttpServletRequest request, HttpServletResponse response) {
+    public FacebookCredential(HttpServletRequest request, HttpServletResponse response) {
         this.request = request;
         this.response = response;
     }
