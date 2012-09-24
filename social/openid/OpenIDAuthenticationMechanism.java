@@ -20,19 +20,17 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-package org.aerogear.todo.server.security.authc.fb;
+package org.aerogear.todo.server.security.authc.social.openid;
 
 import java.io.IOException;
 import java.security.Principal;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.aerogear.todo.server.security.authc.oauth.FacebookCredential;
 import org.jboss.picketlink.idm.IdentityManager;
 import org.jboss.picketlink.idm.model.Group;
 import org.jboss.picketlink.idm.model.Role;
@@ -50,22 +48,20 @@ import org.picketbox.core.exceptions.AuthenticationException;
  * @author Anil Saldhana
  * @author Pedro Silva
  */
-public class FacebookAuthenticationMechanism extends AbstractAuthenticationMechanism {
-
-    private static final String FB_AUTH_STATE_SESSION_ATTRIBUTE = "FB_AUTH_STATE_SESSION_ATTRIBUTE";
+public class OpenIDAuthenticationMechanism extends AbstractAuthenticationMechanism {
     protected String returnURL;
-    protected String clientID;
-    protected String clientSecret;
+    protected String requiredAttributes;
+    protected String optionalAttributes;
     protected String scope = "email";
 
-    protected FacebookProcessor processor;
+    protected OpenIDProcessor processor;
     
     protected IdentityManager identityManager;
 
-    public FacebookAuthenticationMechanism() {
-        clientID = System.getProperty("FB_CLIENT_ID");
-        clientSecret = System.getProperty("FB_CLIENT_SECRET");
-        returnURL = System.getProperty("FB_RETURN_URL");
+    public OpenIDAuthenticationMechanism() {
+        requiredAttributes = System.getProperty("OPENID_REQUIRED","name,email,ax_firstName,ax_lastName,ax_fullName,ax_email");
+        optionalAttributes = System.getProperty("OPENID_OPTIONAL");
+        returnURL = System.getProperty("OPENID_RETURN_URL");
     }
     
     private enum STATES {
@@ -85,7 +81,7 @@ public class FacebookAuthenticationMechanism extends AbstractAuthenticationMecha
     public List<AuthenticationInfo> getAuthenticationInfo() {
         ArrayList<AuthenticationInfo> info = new ArrayList<AuthenticationInfo>();
 
-        info.add(new AuthenticationInfo("oAuth Authentication", "Provides oAuth authentication.", FacebookCredential.class));
+        info.add(new AuthenticationInfo("oAuth Authentication", "Provides oAuth authentication.", OpenIDCredential.class));
 
         return info;
     }
@@ -96,63 +92,74 @@ public class FacebookAuthenticationMechanism extends AbstractAuthenticationMecha
     @Override
     protected Principal doAuthenticate(AuthenticationManager authenticationManager, Credential credential,
             AuthenticationResult result) throws AuthenticationException {
-        FacebookCredential oAuthCredential = (org.aerogear.todo.server.security.authc.oauth.FacebookCredential) credential;
+        OpenIDCredential oAuthCredential = (OpenIDCredential) credential;
+        if (processor == null)
+            processor = new OpenIDProcessor(returnURL, requiredAttributes, optionalAttributes);
+
+        List<String> roles = new ArrayList<String>();
+        roles.add("Guest");
         
+        if (!processor.isInitialized()) {
+            try {
+                processor.initialize(roles);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
         HttpServletRequest request = oAuthCredential.getRequest();
         HttpServletResponse response = oAuthCredential.getResponse();
         HttpSession session = request.getSession();
-
-        Principal principal = null;
         
-        if (isFirstInteraction(session)) {
+        HttpSession httpSession = request.getSession();
+        String state = (String) httpSession.getAttribute("STATE");
+
+        Principal principal = (Principal) session.getAttribute("PRINCIPAL"); 
+
+        if (STATES.FINISH.name().equals(state)){
+            return principal;   
+        }
+
+        if (state == null || state.isEmpty()) {
             try {
-                getFacebookProcessor().initialInteraction(request, response);
+                processor.prepareAndSendAuthRequest(request, response);
+                state = (String) httpSession.getAttribute("STATE");
+                return null;
             } catch (IOException e) {
-                throw new AuthenticationException("Error while initiating Facebook authentication interaction.", e);
+                throw new RuntimeException(e);
             }
-        } else if (isAuthenticationInteraction(session)) {
-            getFacebookProcessor().handleAuthStage(request, response);
-        } else if (isAuthorizationInteraction(session)) {
-            session.removeAttribute(FB_AUTH_STATE_SESSION_ATTRIBUTE);
-            principal = getFacebookProcessor().getPrincipal(request, response);
-            checkUserInStore((FacebookPrincipal) principal);
         }
         
-        return principal;
-    }
+        // We have sent an auth request
+        if (state.equals(STATES.AUTH.name())) {
+            session = request.getSession(true);
+           
+            try {
+                principal = processor.processIncomingAuthResult(request, response);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            if (principal == null)
+                throw new RuntimeException("Principal was null. Maybe login modules need to be configured properly.");
+            session.setAttribute("PRINCIPAL", principal);
 
-    private boolean isAuthorizationInteraction(HttpSession session) {
-        return getCurrentAuthenticationState(session).equals(STATES.AUTHZ.name());
-    }
-
-    private boolean isAuthenticationInteraction(HttpSession session) {
-        return getCurrentAuthenticationState(session).equals(STATES.AUTH.name());
-    }
-
-    private boolean isFirstInteraction(HttpSession session) {
-        return getCurrentAuthenticationState(session) == null || getCurrentAuthenticationState(session).isEmpty();
-    }
-
-    private String getCurrentAuthenticationState(HttpSession session) {
-        return (String) session.getAttribute(FB_AUTH_STATE_SESSION_ATTRIBUTE);
-    }
-
-    @SuppressWarnings("unchecked")
-    private FacebookProcessor getFacebookProcessor() {
-        if (this.processor == null) {
-            this.processor = new FacebookProcessor(clientID, clientSecret, scope, returnURL, Collections.EMPTY_LIST);
+            checkUserInStore((OpenIdPrincipal) principal);
+            session.setAttribute("STATE", STATES.FINISH.name());
+            return principal;
         }
-        return this.processor;
-    }
+        return principal;
+    } 
+   
     
-    private void checkUserInStore(FacebookPrincipal principal){
+    private void checkUserInStore(OpenIdPrincipal openIDPrincipal){
         if(identityManager != null){
-            User storedUser = identityManager.getUser(principal.getName());
-            if(storedUser == null){
-                User newUser = identityManager.createUser(principal.getName());
-                newUser.setFirstName(principal.getFirstName());
-                newUser.setLastName(principal.getLastName());
-                newUser.setEmail(principal.getEmail());
+            User newUser = null;
+            
+            User storedUser = identityManager.getUser(openIDPrincipal.getFullName());
+            if(storedUser == null){ 
+                newUser = identityManager.createUser(openIDPrincipal.getFullName());
+                newUser.setFirstName(openIDPrincipal.getFirstName());
+                newUser.setLastName(openIDPrincipal.getLastName());
+                newUser.setEmail(openIDPrincipal.getEmail()); 
 
                 Role guest = this.identityManager.createRole("guest");
                 Group guests = identityManager.createGroup("Guests");

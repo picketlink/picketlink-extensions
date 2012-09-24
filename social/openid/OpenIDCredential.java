@@ -19,22 +19,21 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-
-package org.aerogear.todo.server.security.authc.fb;
+package org.aerogear.todo.server.security.authc.social.openid;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.picketbox.core.AbstractCredential;
 
-/**
- * @author <a href="mailto:psilva@redhat.com">Pedro Silva</a>
- *
- */
-public class FacebookCredentialCredential extends AbstractCredential {
-
+public class OpenIDCredential extends AbstractCredential {
     private HttpServletRequest request;
     private HttpServletResponse response;
+
+    public OpenIDCredential(HttpServletRequest request, HttpServletResponse response) {
+        this.request = request;
+        this.response = response;
+    }
 
     /**
      * @return the request
@@ -53,9 +52,8 @@ public class FacebookCredentialCredential extends AbstractCredential {
     public HttpServletResponse getResponse() {
         return this.response;
     }
-    
+
     public void setResponse(HttpServletResponse response) {
         this.response = response;
     }
-    
 }
