@@ -36,7 +36,6 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 
 import org.aerogear.todo.server.security.authc.social.openid.OpenIDCredential;
-import org.aerogear.todo.server.security.authc.social.openid.OpenIdPrincipal;
 import org.jboss.picketlink.cdi.Identity;
 import org.jboss.picketlink.cdi.credential.Credential;
 import org.jboss.picketlink.cdi.credential.LoginCredentials;
@@ -45,6 +44,7 @@ import org.jboss.picketlink.idm.model.User;
 import org.picketbox.cdi.PicketBoxCDISubject;
 import org.picketbox.cdi.PicketBoxUser;
 import org.picketbox.core.PicketBoxSubject;
+import org.picketlink.social.standalone.oauth.OpenIdPrincipal;
 
 /**
  * Enables signin with facebook

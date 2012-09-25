@@ -41,6 +41,8 @@ import org.picketbox.core.authentication.AuthenticationManager;
 import org.picketbox.core.authentication.AuthenticationResult;
 import org.picketbox.core.authentication.impl.AbstractAuthenticationMechanism;
 import org.picketbox.core.exceptions.AuthenticationException;
+import org.picketlink.social.standalone.oauth.OpenIDProcessor;
+import org.picketlink.social.standalone.oauth.OpenIdPrincipal;
 
 /**
  * An authentication mechanism for Facebook SignIn
