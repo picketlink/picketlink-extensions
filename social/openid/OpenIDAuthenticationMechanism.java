@@ -45,7 +45,7 @@ import org.picketlink.social.standalone.oauth.OpenIDProcessor;
 import org.picketlink.social.standalone.oauth.OpenIdPrincipal;
 
 /**
- * An authentication mechanism for Facebook SignIn
+ * An authentication mechanism for Google/OpenID SignIn
  * 
  * @author Anil Saldhana
  * @author Pedro Silva

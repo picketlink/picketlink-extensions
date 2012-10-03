@@ -97,7 +97,7 @@ public class FacebookAuthenticationMechanism extends AbstractAuthenticationMecha
     @Override
     protected Principal doAuthenticate(AuthenticationManager authenticationManager, Credential credential,
             AuthenticationResult result) throws AuthenticationException {
-        FacebookCredential oAuthCredential = (org.aerogear.todo.server.security.authc.social.fb.FacebookCredential) credential;
+        FacebookCredential oAuthCredential = (FacebookCredential) credential;
         
         HttpServletRequest request = oAuthCredential.getRequest();
         HttpServletResponse response = oAuthCredential.getResponse();
