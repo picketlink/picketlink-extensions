@@ -40,11 +40,11 @@ import org.jboss.picketlink.cdi.Identity;
 import org.jboss.picketlink.cdi.credential.Credential;
 import org.jboss.picketlink.cdi.credential.LoginCredentials;
 import org.jboss.picketlink.idm.IdentityManager;
+import org.jboss.picketlink.idm.model.Role;
 import org.jboss.picketlink.idm.model.User;
 import org.picketbox.cdi.PicketBoxCDISubject;
 import org.picketbox.cdi.PicketBoxUser;
 import org.picketbox.core.PicketBoxSubject;
-import org.picketlink.social.standalone.oauth.OpenIdPrincipal;
 
 /**
  * Enables signin with facebook
@@ -95,19 +95,21 @@ public class TwitterSignInEndpoint {
      * TODO: user provisioning feature should be provided by PicketBox ? 
      */
     private void provisionNewUser() {
-        OpenIdPrincipal openIDPrincipal = getAuthenticatedPrincipal();
+        TwitterPrincipal twitterPrincipal = getAuthenticatedPrincipal();
         
         //Check if the user exists in DB
-        User storedUser = identityManager.getUser(openIDPrincipal.getName());
+        User storedUser = identityManager.getUser(twitterPrincipal.getName());
         if(storedUser == null){
-            storedUser = identityManager.createUser(openIDPrincipal.getFullName());
+            storedUser = identityManager.createUser(twitterPrincipal.getName());
+            storedUser.setFirstName(twitterPrincipal.getName());
+            
+            Role guest = this.identityManager.createRole("guest");
 
-            storedUser = identityManager.createUser(openIDPrincipal.getFullName());
-            storedUser.setFirstName(openIDPrincipal.getFirstName());
-            storedUser.setLastName(openIDPrincipal.getLastName());
-            storedUser.setEmail(openIDPrincipal.getEmail()); 
+            identityManager.grantRole(guest, storedUser, null);
         }
         ArrayList<String> roles = new ArrayList<String>();
+        
+
         
         /*Role guest = this.identityManager.createRole("guest");
         Group guests = identityManager.createGroup("Guests");
@@ -122,11 +124,11 @@ public class TwitterSignInEndpoint {
         subject.setRoleNames(roles);
     }
 
-    private OpenIdPrincipal getAuthenticatedPrincipal() {
+    private TwitterPrincipal getAuthenticatedPrincipal() {
         PicketBoxUser user = (PicketBoxUser) identity.getUser();
         PicketBoxSubject subject = user.getSubject();
         
-        return (OpenIdPrincipal) subject.getUser();
+        return (TwitterPrincipal) subject.getUser();
     }
 
     private AuthenticationResponse createSuccessfulAuthResponse() {

@@ -101,8 +101,6 @@ public class OpenIDSignInEndpoint {
         User storedUser = identityManager.getUser(openIDPrincipal.getName());
         if(storedUser == null){
             storedUser = identityManager.createUser(openIDPrincipal.getFullName());
-
-            storedUser = identityManager.createUser(openIDPrincipal.getFullName());
             storedUser.setFirstName(openIDPrincipal.getFirstName());
             storedUser.setLastName(openIDPrincipal.getLastName());
             storedUser.setEmail(openIDPrincipal.getEmail()); 

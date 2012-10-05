@@ -24,6 +24,8 @@ package org.aerogear.todo.server.security.authc.social.twitter;
 import java.io.Serializable;
 import java.security.Principal;
 
+import twitter4j.User;
+
 /**
  * Represents a {@link Principal} via Twitter login
  * @author anil saldhana
@@ -33,8 +35,13 @@ public class TwitterPrincipal implements Principal, Serializable {
 
     private static final long serialVersionUID = 1L;
 
+    private String name;
+    
+    public TwitterPrincipal(User user){
+        name = user.getName();
+    }
     @Override
     public String getName() {
-        return null;
+        return name;
     }
 }
