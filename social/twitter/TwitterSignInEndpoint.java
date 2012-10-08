@@ -36,14 +36,15 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 
 import org.aerogear.todo.server.security.authc.AuthenticationResponse;
-import org.jboss.picketlink.cdi.Identity;
-import org.jboss.picketlink.cdi.credential.Credential;
-import org.jboss.picketlink.cdi.credential.LoginCredentials;
-import org.jboss.picketlink.idm.IdentityManager;
-import org.jboss.picketlink.idm.model.User;
-import org.picketbox.cdi.PicketBoxCDISubject;
-import org.picketbox.cdi.PicketBoxUser;
+import org.picketbox.cdi.PicketBoxIdentity;
+import org.picketbox.cdi.idm.IdentityManagerBinding;
 import org.picketbox.core.PicketBoxSubject;
+import org.picketlink.cdi.credential.Credential;
+import org.picketlink.cdi.credential.LoginCredentials;
+import org.picketlink.idm.IdentityManager;
+import org.picketlink.idm.model.Group;
+import org.picketlink.idm.model.Role;
+import org.picketlink.idm.model.User;
 import org.picketlink.social.standalone.oauth.OpenIdPrincipal;
 
 /**
@@ -54,10 +55,11 @@ import org.picketlink.social.standalone.oauth.OpenIdPrincipal;
  */
 @Stateless
 @Path("/twitter")
+@IdentityManagerBinding
 public class TwitterSignInEndpoint {
 
     @Inject
-    private Identity identity;
+    private PicketBoxIdentity identity;
 
     @Inject
     private LoginCredentials credential;
@@ -66,11 +68,12 @@ public class TwitterSignInEndpoint {
     private IdentityManager identityManager;
 
     @GET
-    public String login(@Context final HttpServletRequest request, @Context final HttpServletResponse response) throws IOException {
+    public String login(@Context final HttpServletRequest request, @Context final HttpServletResponse response)
+            throws IOException {
         if (this.identity.isLoggedIn()) {
             return null;
         }
-        
+
         this.credential.setCredential(new Credential<TwitterCredential>() {
 
             @Override
@@ -78,69 +81,82 @@ public class TwitterSignInEndpoint {
                 return new TwitterCredential(request, response);
             }
         });
-        
+
         this.identity.login();
-        
+
         if (this.identity.isLoggedIn()) {
             provisionNewUser();
             return "<script>window.opener.sendMainPage();</script>";
         }
-        
+
         return null;
     }
 
     /**
-     * <p>Provision the authenticated user if he is not stored yes.</p>
+     * <p>
+     * Provision the authenticated user if he is not stored yes.
+     * </p>
      * 
-     * TODO: user provisioning feature should be provided by PicketBox ? 
+     * TODO: user provisioning feature should be provided by PicketBox ?
      */
     private void provisionNewUser() {
         OpenIdPrincipal openIDPrincipal = getAuthenticatedPrincipal();
-        
-        //Check if the user exists in DB
+
+        // Check if the user exists in DB
         User storedUser = identityManager.getUser(openIDPrincipal.getName());
-        if(storedUser == null){
+        if (storedUser == null) {
             storedUser = identityManager.createUser(openIDPrincipal.getFullName());
 
             storedUser = identityManager.createUser(openIDPrincipal.getFullName());
             storedUser.setFirstName(openIDPrincipal.getFirstName());
             storedUser.setLastName(openIDPrincipal.getLastName());
-            storedUser.setEmail(openIDPrincipal.getEmail()); 
-        }
-        ArrayList<String> roles = new ArrayList<String>();
-        
-        /*Role guest = this.identityManager.createRole("guest");
-        Group guests = identityManager.createGroup("Guests");
+            storedUser.setEmail(openIDPrincipal.getEmail());
 
-        identityManager.grantRole(guest, storedUser, guests);*/
-        // necessary because we need to show the user info at the main page. Otherwise the informations will be show only after the second login.
-        PicketBoxUser user = (PicketBoxUser) identity.getUser();
-        PicketBoxCDISubject subject = user.getSubject();
-        
-        subject.setIdmUser(storedUser);
-        
-        subject.setRoleNames(roles);
+            // necessary because we need to show the user info at the main page. Otherwise the informations will be show only
+            // after the second login.
+            Role guest = this.identityManager.createRole("guest");
+
+            Group guests = identityManager.createGroup("Guests");
+
+            identityManager.grantRole(guest, storedUser, guests);
+
+            PicketBoxSubject subject = this.identity.getSubject();
+
+            subject.setUser(storedUser);
+
+            ArrayList<Role> roles = new ArrayList<Role>();
+
+            roles.add(guest);
+
+            subject.setRoles(roles);
+        }
+
+        /*
+         * Role guest = this.identityManager.createRole("guest"); Group guests = identityManager.createGroup("Guests");
+         * 
+         * identityManager.grantRole(guest, storedUser, guests);
+         */
     }
 
     private OpenIdPrincipal getAuthenticatedPrincipal() {
-        PicketBoxUser user = (PicketBoxUser) identity.getUser();
-        PicketBoxSubject subject = user.getSubject();
-        
-        return (OpenIdPrincipal) subject.getUser();
+        PicketBoxSubject subject = this.identity.getSubject();
+
+        return (OpenIdPrincipal) subject.getPrincipal();
     }
 
     private AuthenticationResponse createSuccessfulAuthResponse() {
         AuthenticationResponse response = new AuthenticationResponse();
-        
+
         response.setLoggedIn(this.identity.isLoggedIn());
-        
+
         return response;
     }
-    
+
     @POST
     @Produces(MediaType.APPLICATION_JSON)
-    public AuthenticationResponse getStatus(@Context HttpServletRequest request, @Context HttpServletResponse response) throws IOException{
-        if(identity.isLoggedIn()){
+    public AuthenticationResponse getStatus(@Context HttpServletRequest request, @Context HttpServletResponse response)
+            throws IOException {
+        if (identity.isLoggedIn()) {
             User user = identity.getUser();
             AuthenticationResponse authResponse = createSuccessfulAuthResponse();
             authResponse.setLoggedIn(true);

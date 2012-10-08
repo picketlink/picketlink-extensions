@@ -22,7 +22,6 @@
 
 package org.aerogear.todo.server.security.authc;
 
-import javax.annotation.PostConstruct;
 import javax.ejb.Stateless;
 import javax.ejb.TransactionAttribute;
 import javax.inject.Inject;
@@ -32,15 +31,11 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
-import org.jboss.picketlink.cdi.Identity;
-import org.jboss.picketlink.cdi.credential.Credential;
-import org.jboss.picketlink.cdi.credential.LoginCredentials;
-import org.jboss.picketlink.idm.IdentityManager;
-import org.jboss.picketlink.idm.model.Group;
-import org.jboss.picketlink.idm.model.Role;
-import org.jboss.picketlink.idm.model.User;
-import org.picketbox.cdi.PicketBoxUser;
+import org.picketbox.cdi.PicketBoxIdentity;
+import org.picketbox.cdi.idm.IdentityManagerBinding;
 import org.picketbox.core.authentication.credential.UsernamePasswordCredential;
+import org.picketlink.cdi.credential.Credential;
+import org.picketlink.cdi.credential.LoginCredentials;
 
 /**
  * <p>JAX-RS Endpoint to authenticate users.</p>
@@ -51,51 +46,14 @@ import org.picketbox.core.authentication.credential.UsernamePasswordCredential;
 @Stateless
 @Path("/signin")
 @TransactionAttribute
+@IdentityManagerBinding
 public class SignInEndpoint {
 
     @Inject
-    private Identity identity;
+    private PicketBoxIdentity identity;
     
     @Inject
     private LoginCredentials credential;
-    
-    @Inject
-    private IdentityManager identityManager;
-    
-    /**
-     * <p>Loads some users during the first construction.</p>
-     */
-    @PostConstruct
-    public void loadUsers() {
-        User abstractj = this.identityManager.createUser("abstractj");
-
-        abstractj.setEmail("abstractj@aerogear.com");
-        abstractj.setFirstName("Bruno");
-        abstractj.setLastName("Oliveira");
-        
-        this.identityManager.updatePassword(abstractj, "123");
-        
-        Role roleDeveloper = this.identityManager.createRole("developer");
-        Role roleAdmin = this.identityManager.createRole("admin");
-
-        Group groupCoreDeveloper = identityManager.createGroup("Core Developers");
-
-        identityManager.grantRole(roleDeveloper, abstractj, groupCoreDeveloper);
-        identityManager.grantRole(roleAdmin, abstractj, groupCoreDeveloper);
-        
-        User guest = this.identityManager.createUser("guest");
-
-        guest.setEmail("guest@aerogear.com");
-        guest.setFirstName("Guest");
-        guest.setLastName("User");
-
-        this.identityManager.updatePassword(guest, "123");
-        
-        Role roleGuest = this.identityManager.createRole("guest");
-        
-        identityManager.grantRole(roleGuest, guest, groupCoreDeveloper);
-    }
-
     
     /**
      * <p>Performs the authentication using the informations provided by the {@link AuthenticationRequest}</p>
@@ -131,9 +89,7 @@ public class SignInEndpoint {
         response.setLoggedIn(this.identity.isLoggedIn());
         
         if (response.isLoggedIn()) {
-            PicketBoxUser user = (PicketBoxUser) this.identity.getUser();
-            
-            response.setToken(user.getSubject().getSession().getId().getId().toString());
+            response.setToken(this.identity.getSubject().getSession().getId().getId().toString());
         }
         
         return response;
