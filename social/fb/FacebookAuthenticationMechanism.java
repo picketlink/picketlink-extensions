@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -60,7 +61,8 @@ public class FacebookAuthenticationMechanism extends AbstractAuthenticationMecha
 
     protected FacebookProcessor processor;
     
-    protected IdentityManager identityManager;
+    @Inject
+    private IdentityManager identityManager;
 
     public FacebookAuthenticationMechanism() {
         clientID = System.getProperty("FB_CLIENT_ID");
@@ -72,15 +74,6 @@ public class FacebookAuthenticationMechanism extends AbstractAuthenticationMecha
         AUTH, AUTHZ, FINISH
     }; 
 
-    public IdentityManager getIdentityManager() {
-        return identityManager;
-    }
-
-    public void setIdentityManager(IdentityManager identityManager) {
-        this.identityManager = identityManager;
-    }
-
-    
     @Override
     public List<AuthenticationInfo> getAuthenticationInfo() {
         ArrayList<AuthenticationInfo> info = new ArrayList<AuthenticationInfo>();

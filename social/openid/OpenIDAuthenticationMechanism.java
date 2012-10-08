@@ -27,6 +27,7 @@ import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -57,7 +58,8 @@ public class OpenIDAuthenticationMechanism extends AbstractAuthenticationMechani
 
     protected OpenIDProcessor processor;
     
-    protected IdentityManager identityManager;
+    @Inject
+    private IdentityManager identityManager;
 
     public OpenIDAuthenticationMechanism() {
         requiredAttributes = System.getProperty("OPENID_REQUIRED","name,email,ax_firstName,ax_lastName,ax_fullName,ax_email");
@@ -69,15 +71,6 @@ public class OpenIDAuthenticationMechanism extends AbstractAuthenticationMechani
         AUTH, AUTHZ, FINISH
     }; 
 
-    public IdentityManager getIdentityManager() {
-        return identityManager;
-    }
-
-    public void setIdentityManager(IdentityManager identityManager) {
-        this.identityManager = identityManager;
-    }
-
-    
     @Override
     public List<AuthenticationInfo> getAuthenticationInfo() {
         ArrayList<AuthenticationInfo> info = new ArrayList<AuthenticationInfo>();
