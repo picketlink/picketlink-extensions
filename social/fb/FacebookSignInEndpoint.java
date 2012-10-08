@@ -38,7 +38,7 @@ import javax.ws.rs.core.MediaType;
 import org.aerogear.todo.server.security.authc.AuthenticationResponse;
 import org.picketbox.cdi.PicketBoxIdentity;
 import org.picketbox.cdi.idm.IdentityManagerBinding;
-import org.picketbox.core.PicketBoxSubject;
+import org.picketbox.core.UserContext;
 import org.picketlink.cdi.credential.Credential;
 import org.picketlink.cdi.credential.LoginCredentials;
 import org.picketlink.idm.IdentityManager;
@@ -118,7 +118,7 @@ public class FacebookSignInEndpoint {
 
             identityManager.grantRole(guest, storedUser, guests);
 
-            PicketBoxSubject subject = this.identity.getSubject();
+            UserContext subject = this.identity.getUserContext();
 
             subject.setUser(storedUser);
 
@@ -131,7 +131,7 @@ public class FacebookSignInEndpoint {
     }
 
     private FacebookPrincipal getAuthenticatedPrincipal() {
-        PicketBoxSubject subject = this.identity.getSubject();
+        UserContext subject = this.identity.getUserContext();
 
         return (FacebookPrincipal) subject.getPrincipal();
     }

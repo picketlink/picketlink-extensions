@@ -89,7 +89,7 @@ public class SignInEndpoint {
         response.setLoggedIn(this.identity.isLoggedIn());
         
         if (response.isLoggedIn()) {
-            response.setToken(this.identity.getSubject().getSession().getId().getId().toString());
+            response.setToken(this.identity.getUserContext().getSession().getId().getId().toString());
         }
         
         return response;
