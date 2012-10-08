@@ -32,7 +32,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 import org.picketbox.cdi.PicketBoxIdentity;
-import org.picketbox.cdi.idm.IdentityManagerBinding;
 import org.picketbox.core.authentication.credential.UsernamePasswordCredential;
 import org.picketlink.cdi.credential.Credential;
 import org.picketlink.cdi.credential.LoginCredentials;
@@ -46,7 +45,6 @@ import org.picketlink.cdi.credential.LoginCredentials;
 @Stateless
 @Path("/signin")
 @TransactionAttribute
-@IdentityManagerBinding
 public class SignInEndpoint {
 
     @Inject

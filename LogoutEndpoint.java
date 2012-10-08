@@ -27,7 +27,6 @@ import javax.inject.Inject;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 
-import org.picketbox.cdi.idm.IdentityManagerBinding;
 import org.picketlink.cdi.Identity;
 
 /**
@@ -38,7 +37,6 @@ import org.picketlink.cdi.Identity;
  */
 @Stateless
 @Path("/logout")
-@IdentityManagerBinding
 public class LogoutEndpoint {
 
     @Inject

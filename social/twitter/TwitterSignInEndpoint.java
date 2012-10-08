@@ -37,7 +37,6 @@ import javax.ws.rs.core.MediaType;
 
 import org.aerogear.todo.server.security.authc.AuthenticationResponse;
 import org.picketbox.cdi.PicketBoxIdentity;
-import org.picketbox.cdi.idm.IdentityManagerBinding;
 import org.picketbox.core.UserContext;
 import org.picketlink.cdi.credential.Credential;
 import org.picketlink.cdi.credential.LoginCredentials;
@@ -55,7 +54,6 @@ import org.picketlink.social.standalone.oauth.OpenIdPrincipal;
  */
 @Stateless
 @Path("/twitter")
-@IdentityManagerBinding
 public class TwitterSignInEndpoint {
 
     @Inject
