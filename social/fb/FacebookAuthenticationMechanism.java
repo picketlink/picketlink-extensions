@@ -103,7 +103,8 @@ public class FacebookAuthenticationMechanism extends AbstractAuthenticationMecha
                 throw new AuthenticationException("Error while initiating Facebook authentication interaction.", e);
             }
         } else if (isAuthenticationInteraction(session)) {
-            getFacebookProcessor().handleAuthStage(request, response);
+            if (!response.isCommitted())
+                getFacebookProcessor().handleAuthStage(request, response);
         } else if (isAuthorizationInteraction(session)) {
             session.removeAttribute(FB_AUTH_STATE_SESSION_ATTRIBUTE);
             principal = getFacebookProcessor().getPrincipal(request, response);

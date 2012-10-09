@@ -69,7 +69,7 @@ public class FacebookSignInEndpoint {
     public String login(@Context final HttpServletRequest request, @Context final HttpServletResponse response)
             throws IOException {
         if (this.identity.isLoggedIn()) {
-            return null;
+            return "<script>window.opener.sendMainPage();</script>";
         }
 
         this.credential.setCredential(new Credential<FacebookCredential>() {
