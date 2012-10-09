@@ -127,12 +127,6 @@ public class OpenIDSignInEndpoint {
 
             subject.setRoles(roles);
         }
-
-        /*
-         * Role guest = this.identityManager.createRole("guest"); Group guests = identityManager.createGroup("Guests");
-         * 
-         * identityManager.grantRole(guest, storedUser, guests);
-         */
     }
 
     private OpenIdPrincipal getAuthenticatedPrincipal() {

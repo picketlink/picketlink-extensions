@@ -41,10 +41,8 @@ import org.picketbox.core.UserContext;
 import org.picketlink.cdi.credential.Credential;
 import org.picketlink.cdi.credential.LoginCredentials;
 import org.picketlink.idm.IdentityManager;
-import org.picketlink.idm.model.Group;
 import org.picketlink.idm.model.Role;
 import org.picketlink.idm.model.User;
-import org.picketlink.social.standalone.oauth.OpenIdPrincipal;
 
 /**
  * Enables signin with facebook
@@ -66,12 +64,11 @@ public class TwitterSignInEndpoint {
     private IdentityManager identityManager;
 
     @GET
-    public String login(@Context final HttpServletRequest request, @Context final HttpServletResponse response)
-            throws IOException {
+    public String login(@Context final HttpServletRequest request, @Context final HttpServletResponse response) throws IOException {
         if (this.identity.isLoggedIn()) {
             return null;
         }
-
+        
         this.credential.setCredential(new Credential<TwitterCredential>() {
 
             @Override
@@ -79,44 +76,35 @@ public class TwitterSignInEndpoint {
                 return new TwitterCredential(request, response);
             }
         });
-
+        
         this.identity.login();
-
+        
         if (this.identity.isLoggedIn()) {
             provisionNewUser();
             return "<script>window.opener.sendMainPage();</script>";
         }
-
+        
         return null;
     }
 
     /**
-     * <p>
-     * Provision the authenticated user if he is not stored yes.
-     * </p>
+     * <p>Provision the authenticated user if he is not stored yes.</p>
      * 
-     * TODO: user provisioning feature should be provided by PicketBox ?
+     * TODO: user provisioning feature should be provided by PicketBox ? 
      */
     private void provisionNewUser() {
-        OpenIdPrincipal openIDPrincipal = getAuthenticatedPrincipal();
-
-        // Check if the user exists in DB
-        User storedUser = identityManager.getUser(openIDPrincipal.getName());
-        if (storedUser == null) {
-            storedUser = identityManager.createUser(openIDPrincipal.getFullName());
-
-            storedUser = identityManager.createUser(openIDPrincipal.getFullName());
-            storedUser.setFirstName(openIDPrincipal.getFirstName());
-            storedUser.setLastName(openIDPrincipal.getLastName());
-            storedUser.setEmail(openIDPrincipal.getEmail());
-
-            // necessary because we need to show the user info at the main page. Otherwise the informations will be show only
-            // after the second login.
+        TwitterPrincipal twitterPrincipal = getAuthenticatedPrincipal();
+        
+        //Check if the user exists in DB
+        User storedUser = identityManager.getUser(twitterPrincipal.getName());
+        
+        if(storedUser == null){
+            storedUser = identityManager.createUser(twitterPrincipal.getName());
+            storedUser.setFirstName(twitterPrincipal.getName());
+            
             Role guest = this.identityManager.createRole("guest");
 
-            Group guests = identityManager.createGroup("Guests");
-
-            identityManager.grantRole(guest, storedUser, guests);
+            identityManager.grantRole(guest, storedUser, null);
 
             UserContext subject = this.identity.getUserContext();
 
@@ -128,33 +116,26 @@ public class TwitterSignInEndpoint {
 
             subject.setRoles(roles);
         }
-
-        /*
-         * Role guest = this.identityManager.createRole("guest"); Group guests = identityManager.createGroup("Guests");
-         * 
-         * identityManager.grantRole(guest, storedUser, guests);
-         */
     }
 
-    private OpenIdPrincipal getAuthenticatedPrincipal() {
-        UserContext subject = this.identity.getUserContext();
-
-        return (OpenIdPrincipal) subject.getPrincipal();
+    private TwitterPrincipal getAuthenticatedPrincipal() {
+        UserContext userContext = identity.getUserContext();
+        
+        return (TwitterPrincipal) userContext.getPrincipal();
     }
 
     private AuthenticationResponse createSuccessfulAuthResponse() {
         AuthenticationResponse response = new AuthenticationResponse();
-
+        
         response.setLoggedIn(this.identity.isLoggedIn());
-
+        
         return response;
     }
-
+    
     @POST
     @Produces(MediaType.APPLICATION_JSON)
-    public AuthenticationResponse getStatus(@Context HttpServletRequest request, @Context HttpServletResponse response)
-            throws IOException {
-        if (identity.isLoggedIn()) {
+    public AuthenticationResponse getStatus(@Context HttpServletRequest request, @Context HttpServletResponse response) throws IOException{
+        if(identity.isLoggedIn()){
             User user = identity.getUser();
             AuthenticationResponse authResponse = createSuccessfulAuthResponse();
             authResponse.setLoggedIn(true);

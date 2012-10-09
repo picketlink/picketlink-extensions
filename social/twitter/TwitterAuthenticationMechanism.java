@@ -22,12 +22,11 @@
 
 package org.aerogear.todo.server.security.authc.social.twitter;
 
-import java.io.IOException;
 import java.security.Principal;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
+import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -41,8 +40,13 @@ import org.picketlink.idm.IdentityManager;
 import org.picketlink.idm.model.Group;
 import org.picketlink.idm.model.Role;
 import org.picketlink.idm.model.User;
-import org.picketlink.social.standalone.fb.FacebookPrincipal;
 import org.picketlink.social.standalone.fb.FacebookProcessor;
+
+import twitter4j.Twitter;
+import twitter4j.TwitterException;
+import twitter4j.TwitterFactory;
+import twitter4j.auth.AccessToken;
+import twitter4j.auth.RequestToken;
 
 /**
  * An authentication mechanism for Twitter SignIn
@@ -52,7 +56,7 @@ import org.picketlink.social.standalone.fb.FacebookProcessor;
  */
 public class TwitterAuthenticationMechanism extends AbstractAuthenticationMechanism {
 
-    private static final String TWIT_AUTH_STATE_SESSION_ATTRIBUTE = "TWIT_AUTH_STATE_SESSION_ATTRIBUTE";
+    private static final String TWIT_REQUEST_TOKEN_SESSION_ATTRIBUTE = "TWIT_REQUEST_TOKEN_SESSION_ATTRIBUTE";
     protected String returnURL;
     protected String clientID;
     protected String clientSecret;
@@ -60,27 +64,15 @@ public class TwitterAuthenticationMechanism extends AbstractAuthenticationMechan
 
     protected FacebookProcessor processor;
     
-    protected IdentityManager identityManager;
+    @Inject
+    private IdentityManager identityManager;
 
     public TwitterAuthenticationMechanism() {
-        clientID = System.getProperty("FB_CLIENT_ID");
-        clientSecret = System.getProperty("FB_CLIENT_SECRET");
-        returnURL = System.getProperty("FB_RETURN_URL");
-    }
-    
-    private enum STATES {
-        AUTH, AUTHZ, FINISH
-    }; 
-
-    public IdentityManager getIdentityManager() {
-        return identityManager;
+        clientID = System.getProperty("TWIT_CLIENT_ID");
+        clientSecret = System.getProperty("TWIT_CLIENT_SECRET");
+        returnURL = System.getProperty("TWIT_RETURN_URL");
     }
 
-    public void setIdentityManager(IdentityManager identityManager) {
-        this.identityManager = identityManager;
-    }
-
-    
     @Override
     public List<AuthenticationInfo> getAuthenticationInfo() {
         ArrayList<AuthenticationInfo> info = new ArrayList<AuthenticationInfo>();
@@ -102,56 +94,48 @@ public class TwitterAuthenticationMechanism extends AbstractAuthenticationMechan
         HttpSession session = request.getSession();
 
         Principal principal = null;
+        Twitter twitter = new TwitterFactory().getInstance();
+        twitter.setOAuthConsumer(clientID, clientSecret);
         
-        if (isFirstInteraction(session)) {
+        //See if we are a callback
+        RequestToken requestToken = (RequestToken) session.getAttribute(TWIT_REQUEST_TOKEN_SESSION_ATTRIBUTE);
+        if(requestToken != null){
+            String verifier = request.getParameter("oauth_verifier");
             try {
-                getFacebookProcessor().initialInteraction(request, response);
-            } catch (IOException e) {
-                throw new AuthenticationException("Error while initiating Facebook authentication interaction.", e);
+                AccessToken accessToken = twitter.getOAuthAccessToken(requestToken, verifier);
+                session.setAttribute("accessToken", accessToken);
+                session.removeAttribute("requestToken");
+            } catch (TwitterException e) {
+                throw new AuthenticationException(e);
             }
-        } else if (isAuthenticationInteraction(session)) {
-            getFacebookProcessor().handleAuthStage(request, response);
-        } else if (isAuthorizationInteraction(session)) {
-            session.removeAttribute(TWIT_AUTH_STATE_SESSION_ATTRIBUTE);
-            principal = getFacebookProcessor().getPrincipal(request, response);
-            checkUserInStore((FacebookPrincipal) principal);
+            
+            try {
+                principal = new TwitterPrincipal(twitter.verifyCredentials());
+                checkUserInStore((TwitterPrincipal) principal);
+            } catch (TwitterException e) {
+                throw new AuthenticationException(e);
+            }
+            return principal;
         }
-        
+        try {
+            requestToken = twitter.getOAuthRequestToken(returnURL);
+            session.setAttribute(TWIT_REQUEST_TOKEN_SESSION_ATTRIBUTE, requestToken);
+            response.sendRedirect(requestToken.getAuthenticationURL());
+
+        } catch (Exception e) {
+            throw new AuthenticationException(e);
+        }
         return principal;
     }
-
-    private boolean isAuthorizationInteraction(HttpSession session) {
-        return getCurrentAuthenticationState(session).equals(STATES.AUTHZ.name());
-    }
-
-    private boolean isAuthenticationInteraction(HttpSession session) {
-        return getCurrentAuthenticationState(session).equals(STATES.AUTH.name());
-    }
-
-    private boolean isFirstInteraction(HttpSession session) {
-        return getCurrentAuthenticationState(session) == null || getCurrentAuthenticationState(session).isEmpty();
-    }
-
-    private String getCurrentAuthenticationState(HttpSession session) {
-        return (String) session.getAttribute(TWIT_AUTH_STATE_SESSION_ATTRIBUTE);
-    }
-
-    @SuppressWarnings("unchecked")
-    private FacebookProcessor getFacebookProcessor() {
-        if (this.processor == null) {
-            this.processor = new FacebookProcessor(clientID, clientSecret, scope, returnURL, Collections.EMPTY_LIST);
-        }
-        return this.processor;
-    }
     
-    private void checkUserInStore(FacebookPrincipal principal){
+    private void checkUserInStore(TwitterPrincipal twitterPrincipal){
         if(identityManager != null){
-            User storedUser = identityManager.getUser(principal.getName());
-            if(storedUser == null){
-                User newUser = identityManager.createUser(principal.getName());
-                newUser.setFirstName(principal.getFirstName());
-                newUser.setLastName(principal.getLastName());
-                newUser.setEmail(principal.getEmail());
+            User newUser = null;
+            
+            User storedUser = identityManager.getUser(twitterPrincipal.getName());
+            if(storedUser == null){ 
+                newUser = identityManager.createUser(twitterPrincipal.getName());
+                newUser.setFirstName(twitterPrincipal.getName());
 
                 Role guest = this.identityManager.createRole("guest");
                 Group guests = identityManager.createGroup("Guests");
