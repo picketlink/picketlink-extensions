@@ -30,6 +30,8 @@ public class AuthenticationRequest implements Serializable {
     
     private String userId;
     private String password;
+    private String otp;
+    
     /**
      * @return the userId
      */
@@ -54,5 +56,18 @@ public class AuthenticationRequest implements Serializable {
     public void setPassword(String password) {
         this.password = password;
     }
-    
+    /**
+     * Get the One Time Password Value
+     * @return
+     */
+    public String getOtp() {
+        return otp;
+    }
+    /**
+     * Set the One Time Password Value
+     * @param otp
+     */
+    public void setOtp(String otp) {
+        this.otp = otp;
+    }
 }
