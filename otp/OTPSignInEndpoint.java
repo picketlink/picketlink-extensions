@@ -22,7 +22,6 @@
 
 package org.aerogear.todo.server.security.authc.otp;
 
-import javax.annotation.PostConstruct;
 import javax.ejb.Stateless;
 import javax.ejb.TransactionAttribute;
 import javax.inject.Inject;
@@ -35,12 +34,10 @@ import javax.ws.rs.core.MediaType;
 import org.aerogear.todo.server.security.authc.AuthenticationRequest;
 import org.aerogear.todo.server.security.authc.AuthenticationResponse;
 import org.picketbox.cdi.PicketBoxIdentity;
+import org.picketbox.core.authentication.credential.OTPCredential;
 import org.picketlink.cdi.credential.Credential;
 import org.picketlink.cdi.credential.LoginCredentials;
 import org.picketlink.idm.IdentityManager;
-import org.picketlink.idm.model.Group;
-import org.picketlink.idm.model.Role;
-import org.picketlink.idm.model.User;
 
 /**
  * <p>JAX-RS Endpoint to authenticate users using otp.</p>
@@ -60,41 +57,6 @@ public class OTPSignInEndpoint {
     
     @Inject
     private IdentityManager identityManager;
-    
-    /**
-     * <p>Loads some users during the first construction.</p>
-     */
-    @PostConstruct
-    public void loadUsers() {
-        User abstractj = this.identityManager.createUser("abstractj");
-
-        abstractj.setEmail("abstractj@aerogear.com");
-        abstractj.setFirstName("Bruno");
-        abstractj.setLastName("Oliveira");
-        
-        this.identityManager.updatePassword(abstractj, "123");
-        
-        Role roleDeveloper = this.identityManager.createRole("developer");
-        Role roleAdmin = this.identityManager.createRole("admin");
-
-        Group groupCoreDeveloper = identityManager.createGroup("Core Developers");
-
-        identityManager.grantRole(roleDeveloper, abstractj, groupCoreDeveloper);
-        identityManager.grantRole(roleAdmin, abstractj, groupCoreDeveloper);
-        
-        User guest = this.identityManager.createUser("guest");
-
-        guest.setEmail("guest@aerogear.com");
-        guest.setFirstName("Guest");
-        guest.setLastName("User");
-
-        this.identityManager.updatePassword(guest, "123");
-        
-        Role roleGuest = this.identityManager.createRole("guest");
-        
-        identityManager.grantRole(roleGuest, guest, groupCoreDeveloper);
-    }
-
     
     /**
      * <p>Performs the authentication using the informations provided by the {@link AuthenticationRequest}</p>

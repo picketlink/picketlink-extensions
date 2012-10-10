@@ -25,7 +25,9 @@ package org.aerogear.todo.server.security.authc.otp;
 import java.security.GeneralSecurityException;
 import java.security.Principal;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
+import java.util.TimeZone;
 
 import javax.inject.Inject;
 
@@ -33,6 +35,7 @@ import org.picketbox.core.Credential;
 import org.picketbox.core.PicketBoxPrincipal;
 import org.picketbox.core.authentication.AuthenticationInfo;
 import org.picketbox.core.authentication.AuthenticationResult;
+import org.picketbox.core.authentication.credential.OTPCredential;
 import org.picketbox.core.authentication.impl.AbstractAuthenticationMechanism;
 import org.picketbox.core.exceptions.AuthenticationException;
 import org.picketbox.core.util.TimeBasedOTP;
@@ -100,21 +103,24 @@ public class OTPAuthenticationMechanism extends AbstractAuthenticationMechanism 
             if(validation){
                 //Validate OTP
                 String seed = user.getAttribute("serial");
-                try {
-                    if( algorithm.equals( TimeBasedOTP.HMAC_SHA1 ))
-                    {
-                       validation =  TimeBasedOTPUtil.validate( otp, seed.getBytes() , NUMBER_OF_DIGITS ); 
+                if( seed != null){
+                    try {
+                        if( algorithm.equals( TimeBasedOTP.HMAC_SHA1 ))
+                        {
+                           //validation =  TimeBasedOTPUtil.validate( otp, seed.getBytes() , NUMBER_OF_DIGITS );
+                           validation =  validate( otp, seed.getBytes() , NUMBER_OF_DIGITS );
+                        }
+                        else if( algorithm.equals( TimeBasedOTP.HMAC_SHA256 ))
+                        {
+                            validation =  TimeBasedOTPUtil.validate256( otp, seed.getBytes() , NUMBER_OF_DIGITS ); 
+                        }
+                        else if( algorithm.equals( TimeBasedOTP.HMAC_SHA512 ))
+                        {
+                            validation =  TimeBasedOTPUtil.validate512( otp, seed.getBytes() , NUMBER_OF_DIGITS ); 
+                        }
+                    } catch (GeneralSecurityException e) {
+                        throw new AuthenticationException(e);
                     }
-                    else if( algorithm.equals( TimeBasedOTP.HMAC_SHA256 ))
-                    {
-                        validation =  TimeBasedOTPUtil.validate256( otp, seed.getBytes() , NUMBER_OF_DIGITS ); 
-                    }
-                    else if( algorithm.equals( TimeBasedOTP.HMAC_SHA512 ))
-                    {
-                        validation =  TimeBasedOTPUtil.validate512( otp, seed.getBytes() , NUMBER_OF_DIGITS ); 
-                    }
-                } catch (GeneralSecurityException e) {
-                    throw new AuthenticationException(e);
                 }
             }
             if(validation){
@@ -140,5 +146,52 @@ public class OTPAuthenticationMechanism extends AbstractAuthenticationMechanism 
                 identityManager.grantRole(guest, newUser, guests);
             }
         }
+    }
+    
+    public static boolean validate(String submittedOTP, byte[] secret, int numDigits) throws GeneralSecurityException {
+        System.out.println("Submitted OTP=" + submittedOTP);
+        long TIME_INTERVAL = 30 * 1000; // 30 secs
+        TimeZone utc = TimeZone.getTimeZone("UTC");
+        Calendar currentDateTime = Calendar.getInstance(utc);
+
+        String generatedTOTP = TimeBasedOTP.generateTOTP(new String(secret), numDigits);
+        boolean result = generatedTOTP.equals(submittedOTP);
+        long timeInMilis = currentDateTime.getTimeInMillis(); 
+        
+        System.out.println(" OTP=" + generatedTOTP);
+
+
+        if (!result) {
+            timeInMilis -= TIME_INTERVAL;
+
+            generatedTOTP = TimeBasedOTP.generateTOTP(new String(secret), "" + timeInMilis, numDigits);
+
+            System.out.println(" OTP=" + generatedTOTP);
+            result = generatedTOTP.equals(submittedOTP);
+        }
+        
+        if (!result) {
+            timeInMilis -= TIME_INTERVAL;
+
+            generatedTOTP = TimeBasedOTP.generateTOTP(new String(secret), "" + timeInMilis, numDigits);
+            System.out.println(" OTP=" + generatedTOTP);
+            result = generatedTOTP.equals(submittedOTP);
+        }
+
+        if (!result) {
+            timeInMilis += TIME_INTERVAL;
+            generatedTOTP = TimeBasedOTP.generateTOTP(new String(secret), "" + timeInMilis, numDigits);
+            System.out.println(" OTP=" + generatedTOTP);
+            result = generatedTOTP.equals(submittedOTP);
+        }
+        
+        if (!result) {
+            timeInMilis += TIME_INTERVAL;
+            generatedTOTP = TimeBasedOTP.generateTOTP(new String(secret), "" + timeInMilis, numDigits);
+            System.out.println(" OTP=" + generatedTOTP);
+            result = generatedTOTP.equals(submittedOTP);
+        }
+
+        return result;
     }
 }
