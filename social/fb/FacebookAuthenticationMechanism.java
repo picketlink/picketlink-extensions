@@ -33,7 +33,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.picketbox.core.Credential;
+import org.picketbox.core.UserCredential;
 import org.picketbox.core.authentication.AuthenticationInfo;
 import org.picketbox.core.authentication.AuthenticationResult;
 import org.picketbox.core.authentication.impl.AbstractAuthenticationMechanism;
@@ -83,11 +83,8 @@ public class FacebookAuthenticationMechanism extends AbstractAuthenticationMecha
         return info;
     }
 
-    /* (non-Javadoc)
-     * @see org.picketbox.core.authentication.impl.AbstractAuthenticationMechanism#doAuthenticate(org.picketbox.core.authentication.AuthenticationManager, org.picketbox.core.Credential, org.picketbox.core.authentication.AuthenticationResult)
-     */
     @Override
-    protected Principal doAuthenticate(Credential credential, AuthenticationResult result) throws AuthenticationException {
+    protected Principal doAuthenticate(UserCredential credential, AuthenticationResult result) throws AuthenticationException {
         FacebookCredential oAuthCredential = (FacebookCredential) credential;
         
         HttpServletRequest request = oAuthCredential.getRequest();

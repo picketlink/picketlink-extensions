@@ -38,8 +38,7 @@ import javax.ws.rs.core.MediaType;
 import org.aerogear.todo.server.security.authc.AuthenticationResponse;
 import org.picketbox.cdi.PicketBoxIdentity;
 import org.picketbox.core.UserContext;
-import org.picketlink.cdi.credential.Credential;
-import org.picketlink.cdi.credential.LoginCredentials;
+import org.picketlink.credential.LoginCredentials;
 import org.picketlink.idm.IdentityManager;
 import org.picketlink.idm.model.Group;
 import org.picketlink.idm.model.Role;
@@ -72,13 +71,7 @@ public class OpenIDSignInEndpoint {
             return null;
         }
 
-        this.credential.setCredential(new Credential<OpenIDCredential>() {
-
-            @Override
-            public OpenIDCredential getValue() {
-                return new OpenIDCredential(request, response);
-            }
-        });
+        this.credential.setCredential(new OpenIDCredential(request, response));
 
         this.identity.login();
 

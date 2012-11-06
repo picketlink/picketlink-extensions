@@ -25,13 +25,13 @@ package org.aerogear.todo.server.security.authc.social.fb;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.picketbox.core.AbstractCredential;
+import org.picketbox.core.AbstractUserCredential;
 
 /**
  * @author <a href="mailto:psilva@redhat.com">Pedro Silva</a>
  *
  */
-public class FacebookCredential extends AbstractCredential {
+public class FacebookCredential extends AbstractUserCredential {
 
     private HttpServletRequest request;
     private HttpServletResponse response;

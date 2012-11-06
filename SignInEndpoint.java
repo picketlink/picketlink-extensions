@@ -33,8 +33,7 @@ import javax.ws.rs.core.MediaType;
 
 import org.picketbox.cdi.PicketBoxIdentity;
 import org.picketbox.core.authentication.credential.UsernamePasswordCredential;
-import org.picketlink.cdi.credential.Credential;
-import org.picketlink.cdi.credential.LoginCredentials;
+import org.picketlink.credential.LoginCredentials;
 
 /**
  * <p>JAX-RS Endpoint to authenticate users.</p>
@@ -67,13 +66,7 @@ public class SignInEndpoint {
             return createResponse(authcRequest);
         }
         
-        credential.setCredential(new Credential<UsernamePasswordCredential>() {
-
-            @Override
-            public UsernamePasswordCredential getValue() {
-                return new UsernamePasswordCredential(authcRequest.getUserId(), authcRequest.getPassword());
-            }
-        });
+        credential.setCredential(new UsernamePasswordCredential(authcRequest.getUserId(), authcRequest.getPassword()));
         
         this.identity.login();
 

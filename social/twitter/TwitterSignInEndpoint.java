@@ -38,8 +38,7 @@ import javax.ws.rs.core.MediaType;
 import org.aerogear.todo.server.security.authc.AuthenticationResponse;
 import org.picketbox.cdi.PicketBoxIdentity;
 import org.picketbox.core.UserContext;
-import org.picketlink.cdi.credential.Credential;
-import org.picketlink.cdi.credential.LoginCredentials;
+import org.picketlink.credential.LoginCredentials;
 import org.picketlink.idm.IdentityManager;
 import org.picketlink.idm.model.Role;
 import org.picketlink.idm.model.User;
@@ -69,13 +68,7 @@ public class TwitterSignInEndpoint {
             return null;
         }
         
-        this.credential.setCredential(new Credential<TwitterCredential>() {
-
-            @Override
-            public TwitterCredential getValue() {
-                return new TwitterCredential(request, response);
-            }
-        });
+        this.credential.setCredential(new TwitterCredential(request, response));
         
         this.identity.login();
         

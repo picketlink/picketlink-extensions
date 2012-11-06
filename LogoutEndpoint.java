@@ -27,7 +27,7 @@ import javax.inject.Inject;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 
-import org.picketlink.cdi.Identity;
+import org.picketlink.Identity;
 
 /**
  * <p>JAX-RS Endpoint to logout users.</p>

@@ -35,9 +35,7 @@ import org.aerogear.todo.server.security.authc.AuthenticationRequest;
 import org.aerogear.todo.server.security.authc.AuthenticationResponse;
 import org.picketbox.cdi.PicketBoxIdentity;
 import org.picketbox.core.authentication.credential.OTPCredential;
-import org.picketlink.cdi.credential.Credential;
-import org.picketlink.cdi.credential.LoginCredentials;
-import org.picketlink.idm.IdentityManager;
+import org.picketlink.credential.LoginCredentials;
 
 /**
  * <p>JAX-RS Endpoint to authenticate users using otp.</p>
@@ -55,9 +53,6 @@ public class OTPSignInEndpoint {
     @Inject
     private LoginCredentials credential;
     
-    @Inject
-    private IdentityManager identityManager;
-    
     /**
      * <p>Performs the authentication using the informations provided by the {@link AuthenticationRequest}</p>
      * 
@@ -72,13 +67,7 @@ public class OTPSignInEndpoint {
             return createResponse(authcRequest);
         }
         
-        credential.setCredential(new Credential<OTPCredential>() {
-
-            @Override
-            public OTPCredential getValue() {
-                return new OTPCredential(authcRequest.getUserId(), authcRequest.getPassword(), authcRequest.getOtp());
-            }
-        });
+        credential.setCredential(new OTPCredential(authcRequest.getUserId(), authcRequest.getPassword(), authcRequest.getOtp()));
         
         this.identity.login();
 

@@ -24,9 +24,9 @@ package org.aerogear.todo.server.security.authc.social.twitter;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.picketbox.core.AbstractCredential;
+import org.picketbox.core.AbstractUserCredential;
 
-public class TwitterCredential extends AbstractCredential {
+public class TwitterCredential extends AbstractUserCredential {
     private HttpServletRequest request;
     private HttpServletResponse response;
 
