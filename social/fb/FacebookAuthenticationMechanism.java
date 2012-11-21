@@ -28,7 +28,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -38,11 +37,6 @@ import org.picketbox.core.authentication.AuthenticationInfo;
 import org.picketbox.core.authentication.AuthenticationResult;
 import org.picketbox.core.authentication.impl.AbstractAuthenticationMechanism;
 import org.picketbox.core.exceptions.AuthenticationException;
-import org.picketlink.idm.IdentityManager;
-import org.picketlink.idm.model.Group;
-import org.picketlink.idm.model.Role;
-import org.picketlink.idm.model.User;
-import org.picketlink.social.standalone.fb.FacebookPrincipal;
 import org.picketlink.social.standalone.fb.FacebookProcessor;
 
 /**
@@ -61,9 +55,6 @@ public class FacebookAuthenticationMechanism extends AbstractAuthenticationMecha
 
     protected FacebookProcessor processor;
     
-    @Inject
-    private IdentityManager identityManager;
-
     public FacebookAuthenticationMechanism() {
         clientID = System.getProperty("FB_CLIENT_ID");
         clientSecret = System.getProperty("FB_CLIENT_SECRET");
@@ -105,7 +96,6 @@ public class FacebookAuthenticationMechanism extends AbstractAuthenticationMecha
         } else if (isAuthorizationInteraction(session)) {
             session.removeAttribute(FB_AUTH_STATE_SESSION_ATTRIBUTE);
             principal = getFacebookProcessor().getPrincipal(request, response);
-            checkUserInStore((FacebookPrincipal) principal);
         }
         
         return principal;
@@ -135,20 +125,4 @@ public class FacebookAuthenticationMechanism extends AbstractAuthenticationMecha
         return this.processor;
     }
     
-    private void checkUserInStore(FacebookPrincipal principal){
-        if(identityManager != null){
-            User storedUser = identityManager.getUser(principal.getName());
-            if(storedUser == null){
-                User newUser = identityManager.createUser(principal.getName());
-                newUser.setFirstName(principal.getFirstName());
-                newUser.setLastName(principal.getLastName());
-                newUser.setEmail(principal.getEmail());
-
-                Role guest = this.identityManager.createRole("guest");
-                Group guests = identityManager.createGroup("Guests");
-
-                identityManager.grantRole(guest, newUser, guests);
-            }
-        }
-    }
 }

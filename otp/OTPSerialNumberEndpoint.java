@@ -61,7 +61,7 @@ public class OTPSerialNumberEndpoint {
         
         User user = userContext.getUser();
         
-        userInfo.setUserId(user.getKey());
+        userInfo.setUserId(user.getId());
         userInfo.setFullName(user.getFullName());
         
         Collection<Role> roles = userContext.getRoles();
@@ -76,7 +76,7 @@ public class OTPSerialNumberEndpoint {
         
         userInfo.setRoles(rolesArray);
         
-        User idmuser = identityManager.getUser(user.getKey());
+        User idmuser = identityManager.getUser(user.getId());
         String serialNumber = idmuser.getAttribute("serial");
         if(serialNumber == null){
             //Generate serial number
@@ -86,11 +86,10 @@ public class OTPSerialNumberEndpoint {
             //Just pick the first 10 characters
             serialNumber = serialNumber.substring(0, 10);
             
-            serialNumber = toHexString(serialNumber.getBytes());
             idmuser.setAttribute("serial", serialNumber);
         }
         userInfo.setSerial(serialNumber);
-        userInfo.setB32(Base32.encode(hexToAscii(serialNumber).getBytes()));
+        userInfo.setB32(Base32.encode(serialNumber.getBytes()));
         
         return userInfo;
     }

@@ -42,6 +42,7 @@ import org.picketlink.credential.LoginCredentials;
 import org.picketlink.idm.IdentityManager;
 import org.picketlink.idm.model.Group;
 import org.picketlink.idm.model.Role;
+import org.picketlink.idm.model.SimpleUser;
 import org.picketlink.idm.model.User;
 import org.picketlink.social.standalone.fb.FacebookPrincipal;
 
@@ -94,12 +95,15 @@ public class FacebookSignInEndpoint {
         FacebookPrincipal principal = getAuthenticatedPrincipal();
 
         // Check if the user exists in DB
-        User storedUser = identityManager.getUser(principal.getName());
+        User storedUser = identityManager.getUser(principal.getEmail());
 
         if (storedUser == null) {
-            storedUser = identityManager.createUser(principal.getEmail());
+            storedUser = new SimpleUser(principal.getEmail());
+            
             storedUser.setFirstName(principal.getFirstName());
             storedUser.setLastName(principal.getLastName());
+            
+            identityManager.createUser(storedUser);
 
             // necessary because we need to show the user info at the main page. Otherwise the informations will be show only
             // after the second login.
