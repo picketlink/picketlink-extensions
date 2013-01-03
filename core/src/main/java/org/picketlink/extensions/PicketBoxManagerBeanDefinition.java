@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-package org.picketbox.cdi;
+package org.picketlink.extensions;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
@@ -38,10 +38,10 @@ import javax.enterprise.inject.spi.BeanManager;
 import javax.enterprise.inject.spi.InjectionPoint;
 import javax.enterprise.inject.spi.InjectionTarget;
 import javax.enterprise.util.AnnotationLiteral;
-
-import org.picketbox.cdi.event.CDIAuthenticationEventManager;
+  
 import org.picketbox.core.PicketBoxManager;
 import org.picketbox.core.config.ConfigurationBuilder;
+import org.picketlink.extensions.event.CDIAuthenticationEventManager;
 
 /**
  * <p>

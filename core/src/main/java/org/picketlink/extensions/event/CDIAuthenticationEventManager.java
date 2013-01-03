@@ -20,35 +20,41 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-package org.picketbox.cdi.authorization;
+package org.picketlink.extensions.event;
 
-import static java.lang.annotation.ElementType.METHOD;
-import static java.lang.annotation.ElementType.TYPE;
-import static java.lang.annotation.RetentionPolicy.RUNTIME;
+import javax.enterprise.inject.Typed;
+import javax.enterprise.inject.spi.BeanManager;
 
-import java.lang.annotation.Documented;
-import java.lang.annotation.Retention;
-import java.lang.annotation.Target;
-
-import javax.inject.Qualifier;
-
-import org.apache.deltaspike.security.api.authorization.annotation.SecurityBindingType;
+import org.picketbox.core.event.PicketBoxEventManager;
 
 /**
- * <p>
- * This annotation can be used on methods and types to define a security constraint where only authenticated users can invoke
- * them.
- * </p>
+ * <p>Implementation of {@link PicketBoxEventManager} that allows to raise events using the CDI {@link BeanManager}.</p>
  *
  * @author <a href="mailto:psilva@redhat.com">Pedro Silva</a>
  *
- * @see AuthorizationManager
  */
-@Target({ TYPE, METHOD })
-@Retention(RUNTIME)
-@SecurityBindingType
-@Documented
-@Qualifier
-public @interface UserLoggedIn {
+@Typed
+public class CDIAuthenticationEventManager implements PicketBoxEventManager {
+
+    private BeanManager beanManager;
+
+    public CDIAuthenticationEventManager(BeanManager beanManager) {
+        this.beanManager = beanManager;
+    }
+
+    /* (non-Javadoc)
+     * @see org.picketbox.core.authentication.AuthenticationEventManager#raiseEvent(org.picketbox.core.authentication.event.AuthenticationEvent)
+     */
+    @Override
+    public void raiseEvent(Object event) {
+        this.beanManager.fireEvent(event);
+    }
+
+    /* (non-Javadoc)
+     * @see org.picketbox.core.event.PicketBoxEventManager#addHandler(org.picketbox.core.event.PicketBoxEventHandler)
+     */
+    @Override
+    public void addHandler(Object handler) {
+    }
 
 }

@@ -20,12 +20,10 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-package org.picketbox.cdi.util;
+package org.picketlink.extensions.util;
 
-import org.picketlink.idm.IdentityManager;
-import org.picketlink.idm.credential.PasswordCredential;
+import org.picketlink.idm.IdentityManager; 
 import org.picketlink.idm.file.internal.FileBasedIdentityStore;
-import org.picketlink.idm.file.internal.FileUser;
 import org.picketlink.idm.internal.DefaultIdentityManager;
 import org.picketlink.idm.model.Group;
 import org.picketlink.idm.model.Role;
@@ -40,7 +38,7 @@ public class IdentityManagerInitializer {
      * <p>Initializes the store with some test data.</p>
      */
     public static void initializeIdentityStore() {
-        FileBasedIdentityStore theStore = new FileBasedIdentityStore();
+        /*FileBasedIdentityStore theStore = new FileBasedIdentityStore();
 
         theStore.setAlwaysCreateFiles(false);
 
@@ -60,7 +58,7 @@ public class IdentityManagerInitializer {
 
         Group groupCoreDeveloper = identityManager.createGroup("PicketBox Group");
 
-        identityManager.grantRole(roleManager, adminUser, groupCoreDeveloper);
+        identityManager.grantRole(roleManager, adminUser, groupCoreDeveloper);*/
     }
 
 }

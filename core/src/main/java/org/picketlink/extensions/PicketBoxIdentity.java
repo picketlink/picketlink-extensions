@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-package org.picketbox.cdi;
+package org.picketlink.extensions;
 
 import javax.enterprise.context.SessionScoped;
 import javax.enterprise.inject.spi.BeanManager;
@@ -34,7 +34,7 @@ import org.picketbox.core.session.DefaultSessionId;
 import org.picketlink.Identity;
 import org.picketlink.authentication.AuthenticationException;
 import org.picketlink.authentication.event.LoginFailedEvent;
-import org.picketlink.credential.LoginCredentials;
+import org.picketlink.credential.internal.DefaultLoginCredentials;
 import org.picketlink.idm.model.User;
 import org.picketlink.internal.DefaultIdentity;
 
@@ -57,7 +57,7 @@ public class PicketBoxIdentity extends DefaultIdentity {
     private BeanManager beanManager;
 
     @Inject
-    private LoginCredentials credential;
+    private DefaultLoginCredentials credential;
 
     @Inject
     private PicketBoxManager picketBoxManager;

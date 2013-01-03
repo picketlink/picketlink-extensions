@@ -20,32 +20,35 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-package org.picketbox.cdi.idm;
+package org.picketlink.extensions.authorization;
 
-import javax.enterprise.context.ApplicationScoped;
-import javax.enterprise.inject.Produces;
-import javax.inject.Inject;
+import static java.lang.annotation.ElementType.METHOD;
+import static java.lang.annotation.ElementType.TYPE;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
-import org.picketbox.core.PicketBoxManager;
-import org.picketlink.idm.IdentityManager;
-import org.picketlink.idm.spi.IdentityStore;
+import java.lang.annotation.Documented;
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
+
+import javax.inject.Qualifier;
+
+import org.apache.deltaspike.security.api.authorization.annotation.SecurityBindingType;
 
 /**
- * <p>Produces an {@link IdentityManager}.</p>
- * <p> {@link IdentityManager} instances are only produced if there is some {@link IdentityStore} bean registered.</p>
+ * <p>
+ * This annotation can be used on methods and types to define a security constraint where only authenticated users can invoke
+ * them.
+ * </p>
  *
  * @author <a href="mailto:psilva@redhat.com">Pedro Silva</a>
  *
+ * @see AuthorizationManager
  */
-public class IdentityManagerProducer {
-
-    @Inject
-    private PicketBoxManager picketBoxManager;
-
-    @Produces
-    @ApplicationScoped
-    public IdentityManager produceIdentityManager() {
-        return this.picketBoxManager.getIdentityManager();
-    }
+@Target({ TYPE, METHOD })
+@Retention(RUNTIME)
+@SecurityBindingType
+@Documented
+@Qualifier
+public @interface UserLoggedIn {
 
 }

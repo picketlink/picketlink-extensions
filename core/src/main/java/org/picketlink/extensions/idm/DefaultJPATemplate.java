@@ -19,23 +19,47 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.picketbox.cdi.auth;
+
+package org.picketlink.extensions.idm;
 
 import javax.enterprise.context.ApplicationScoped;
-import javax.enterprise.inject.Produces;
+import javax.enterprise.inject.Instance;
+import javax.inject.Inject;
+import javax.persistence.EntityManager;
 
-import org.picketbox.core.authentication.impl.OTPAuthenticationMechanism;
+import org.picketlink.idm.jpa.schema.internal.JPATemplate;
 
 /**
- * Produces {@link OTPAuthenticationMechanism}
- * @author anil saldhana
- * @since Oct 10, 2012
+ * <p>
+ * Custom {@link JPATemplate} to be used during the JPA Identity Store configuration. This bean automatically inject the
+ * {@link EntityManager} instance to be used during the IDM operations.
+ * </p>
+ *
+ * @author pedroigor
+ *
  */
-public class OTPAuthenticationMechanismProducer {
+@ApplicationScoped
+public class DefaultJPATemplate extends JPATemplate {
 
-    @Produces
-    @ApplicationScoped
-    public OTPAuthenticationMechanism produceMechanism(){
-        return new OTPAuthenticationMechanism();
+    @Inject
+    private Instance<EntityManager> entityManager;
+
+    /*
+     * (non-Javadoc)
+     *
+     * @see org.picketlink.idm.internal.jpa.JPATemplate#getEntityManager()
+     */
+    @Override
+    protected EntityManager getEntityManager() {
+        EntityManager entityManager = null;
+
+        try {
+            entityManager = this.entityManager.get();
+        } catch (Exception e) {
+
+        }
+
+        return entityManager;
     }
+
 }

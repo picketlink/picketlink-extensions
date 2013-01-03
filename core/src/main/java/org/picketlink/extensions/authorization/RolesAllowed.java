@@ -20,41 +20,37 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-package org.picketbox.cdi.event;
+package org.picketlink.extensions.authorization;
 
-import javax.enterprise.inject.Typed;
-import javax.enterprise.inject.spi.BeanManager;
+import static java.lang.annotation.ElementType.METHOD;
+import static java.lang.annotation.ElementType.TYPE;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
-import org.picketbox.core.event.PicketBoxEventManager;
+import java.lang.annotation.Documented;
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
+
+import javax.enterprise.util.Nonbinding;
+
+import org.apache.deltaspike.security.api.authorization.annotation.SecurityBindingType;
 
 /**
- * <p>Implementation of {@link PicketBoxEventManager} that allows to raise events using the CDI {@link BeanManager}.</p>
+ * <p>
+ * This annotation can be used on methods and types to define a security constraint where only the specified roles are allowed to invoke
+ * them.
+ * </p>
  *
  * @author <a href="mailto:psilva@redhat.com">Pedro Silva</a>
  *
+ * @see AuthorizationManager
  */
-@Typed
-public class CDIAuthenticationEventManager implements PicketBoxEventManager {
+@Retention(RUNTIME)
+@Target({ METHOD, TYPE })
+@SecurityBindingType
+@Documented
+public @interface RolesAllowed {
 
-    private BeanManager beanManager;
-
-    public CDIAuthenticationEventManager(BeanManager beanManager) {
-        this.beanManager = beanManager;
-    }
-
-    /* (non-Javadoc)
-     * @see org.picketbox.core.authentication.AuthenticationEventManager#raiseEvent(org.picketbox.core.authentication.event.AuthenticationEvent)
-     */
-    @Override
-    public void raiseEvent(Object event) {
-        this.beanManager.fireEvent(event);
-    }
-
-    /* (non-Javadoc)
-     * @see org.picketbox.core.event.PicketBoxEventManager#addHandler(org.picketbox.core.event.PicketBoxEventHandler)
-     */
-    @Override
-    public void addHandler(Object handler) {
-    }
+    @Nonbinding
+    String[] value() default {};
 
 }

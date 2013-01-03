@@ -20,16 +20,15 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-package org.picketbox.cdi.authorization;
-
-import static org.picketbox.cdi.util.AnnotationUtil.getDeclaredAnnotation;
+package org.picketlink.extensions.authorization;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.interceptor.InvocationContext;
 
 import org.apache.deltaspike.security.api.authorization.annotation.Secures;
-import org.picketbox.cdi.PicketBoxIdentity;
 import org.picketlink.Identity;
+import org.picketlink.extensions.PicketBoxIdentity;
+import org.picketlink.extensions.util.AnnotationUtil;
 
 /**
  * <p>
@@ -93,7 +92,7 @@ public class AuthorizationManager {
      * @return
      */
     private String[] getRestrictedRoles(InvocationContext ctx) {
-        RolesAllowed restrictedRolesAnnotation = getDeclaredAnnotation(RolesAllowed.class, ctx);
+        RolesAllowed restrictedRolesAnnotation = AnnotationUtil.getDeclaredAnnotation(RolesAllowed.class, ctx);
 
         if (restrictedRolesAnnotation != null) {
             return restrictedRolesAnnotation.value();

@@ -20,37 +20,32 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-package org.picketbox.cdi.authorization;
+package org.picketlink.extensions.idm;
 
-import static java.lang.annotation.ElementType.METHOD;
-import static java.lang.annotation.ElementType.TYPE;
-import static java.lang.annotation.RetentionPolicy.RUNTIME;
+import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.inject.Produces;
+import javax.inject.Inject;
 
-import java.lang.annotation.Documented;
-import java.lang.annotation.Retention;
-import java.lang.annotation.Target;
-
-import javax.enterprise.util.Nonbinding;
-
-import org.apache.deltaspike.security.api.authorization.annotation.SecurityBindingType;
+import org.picketbox.core.PicketBoxManager;
+import org.picketlink.idm.IdentityManager;
+import org.picketlink.idm.spi.IdentityStore;
 
 /**
- * <p>
- * This annotation can be used on methods and types to define a security constraint where only the specified roles are allowed to invoke
- * them.
- * </p>
+ * <p>Produces an {@link IdentityManager}.</p>
+ * <p> {@link IdentityManager} instances are only produced if there is some {@link IdentityStore} bean registered.</p>
  *
  * @author <a href="mailto:psilva@redhat.com">Pedro Silva</a>
  *
- * @see AuthorizationManager
  */
-@Retention(RUNTIME)
-@Target({ METHOD, TYPE })
-@SecurityBindingType
-@Documented
-public @interface RolesAllowed {
+public class IdentityManagerProducer {
 
-    @Nonbinding
-    String[] value() default {};
+    @Inject
+    private PicketBoxManager picketBoxManager;
+
+    @Produces
+    @ApplicationScoped
+    public IdentityManager produceIdentityManager() {
+        return this.picketBoxManager.getIdentityManager();
+    }
 
 }

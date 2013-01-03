@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-package org.picketbox.cdi.util;
+package org.picketlink.extensions.util;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
