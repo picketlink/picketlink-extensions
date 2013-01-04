@@ -31,9 +31,9 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
+import org.picketbox.cdi.LoginCredential;
 import org.picketbox.cdi.PicketBoxIdentity;
 import org.picketbox.core.authentication.credential.UsernamePasswordCredential;
-import org.picketlink.credential.LoginCredentials;
 
 /**
  * <p>JAX-RS Endpoint to authenticate users.</p>
@@ -50,7 +50,7 @@ public class SignInEndpoint {
     private PicketBoxIdentity identity;
     
     @Inject
-    private LoginCredentials credential;
+    private LoginCredential credential;
     
     /**
      * <p>Performs the authentication using the informations provided by the {@link AuthenticationRequest}</p>

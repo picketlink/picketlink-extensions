@@ -36,6 +36,7 @@ import org.picketbox.cdi.PicketBoxIdentity;
 import org.picketbox.core.UserContext;
 import org.picketbox.core.util.Base32;
 import org.picketlink.idm.IdentityManager;
+import org.picketlink.idm.model.Attribute;
 import org.picketlink.idm.model.Role;
 import org.picketlink.idm.model.User;
 
@@ -62,7 +63,7 @@ public class OTPSerialNumberEndpoint {
         User user = userContext.getUser();
         
         userInfo.setUserId(user.getId());
-        userInfo.setFullName(user.getFullName());
+        userInfo.setFullName(user.getFirstName() + " " + user.getLastName());
         
         Collection<Role> roles = userContext.getRoles();
         String[] rolesArray = new String[roles.size()];
@@ -77,19 +78,24 @@ public class OTPSerialNumberEndpoint {
         userInfo.setRoles(rolesArray);
         
         User idmuser = identityManager.getUser(user.getId());
-        String serialNumber = idmuser.getAttribute("serial");
-        if(serialNumber == null){
+        Attribute<String> attribute = idmuser.getAttribute("serial");
+        
+        if(attribute == null){
             //Generate serial number
-            serialNumber = UUID.randomUUID().toString();
+            String serialNumber = UUID.randomUUID().toString();
             serialNumber = serialNumber.replace('-', 'c');
             
             //Just pick the first 10 characters
             serialNumber = serialNumber.substring(0, 10);
             
-            idmuser.setAttribute("serial", serialNumber);
+            attribute = new Attribute<String>("serial", serialNumber);
+            
+            idmuser.setAttribute(attribute);
+            this.identityManager.update(idmuser);
         }
-        userInfo.setSerial(serialNumber);
-        userInfo.setB32(Base32.encode(serialNumber.getBytes()));
+        
+        userInfo.setSerial(attribute.getValue());
+        userInfo.setB32(Base32.encode(attribute.getValue().getBytes()));
         
         return userInfo;
     }

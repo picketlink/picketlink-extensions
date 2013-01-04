@@ -40,6 +40,9 @@ import org.picketbox.core.exceptions.AuthenticationException;
 import org.picketlink.idm.IdentityManager;
 import org.picketlink.idm.model.Group;
 import org.picketlink.idm.model.Role;
+import org.picketlink.idm.model.SimpleGroup;
+import org.picketlink.idm.model.SimpleRole;
+import org.picketlink.idm.model.SimpleUser;
 import org.picketlink.idm.model.User;
 import org.picketlink.social.standalone.oauth.OpenIDProcessor;
 import org.picketlink.social.standalone.oauth.OpenIdPrincipal;
@@ -146,15 +149,23 @@ public class OpenIDAuthenticationMechanism extends AbstractAuthenticationMechani
             
             User storedUser = identityManager.getUser(openIDPrincipal.getFullName());
             if(storedUser == null){ 
-                newUser = identityManager.createUser(openIDPrincipal.getFullName());
+                newUser = new SimpleUser(openIDPrincipal.getFullName());
+                
                 newUser.setFirstName(openIDPrincipal.getFirstName());
                 newUser.setLastName(openIDPrincipal.getLastName());
                 newUser.setEmail(openIDPrincipal.getEmail()); 
 
-                Role guest = this.identityManager.createRole("guest");
-                Group guests = identityManager.createGroup("Guests");
+                identityManager.add(newUser);
+                
+                Role guest = new SimpleRole("guest");
+                
+                this.identityManager.add(guest);
 
-                identityManager.grantRole(guest, newUser, guests);
+                Group guests = new SimpleGroup("Guests");
+                
+                identityManager.add(guests);
+
+                identityManager.grantRole(storedUser, guest);
             }
         }
     }

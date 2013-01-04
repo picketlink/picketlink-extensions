@@ -33,9 +33,9 @@ import javax.ws.rs.core.MediaType;
 
 import org.aerogear.todo.server.security.authc.AuthenticationRequest;
 import org.aerogear.todo.server.security.authc.AuthenticationResponse;
+import org.picketbox.cdi.LoginCredential;
 import org.picketbox.cdi.PicketBoxIdentity;
 import org.picketbox.core.authentication.credential.OTPCredential;
-import org.picketlink.credential.LoginCredentials;
 
 /**
  * <p>JAX-RS Endpoint to authenticate users using otp.</p>
@@ -51,7 +51,7 @@ public class OTPSignInEndpoint {
     private PicketBoxIdentity identity;
     
     @Inject
-    private LoginCredentials credential;
+    private LoginCredential credential;
     
     /**
      * <p>Performs the authentication using the informations provided by the {@link AuthenticationRequest}</p>

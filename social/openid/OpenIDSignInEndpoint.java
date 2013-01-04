@@ -36,12 +36,15 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 
 import org.aerogear.todo.server.security.authc.AuthenticationResponse;
+import org.picketbox.cdi.LoginCredential;
 import org.picketbox.cdi.PicketBoxIdentity;
 import org.picketbox.core.UserContext;
-import org.picketlink.credential.LoginCredentials;
 import org.picketlink.idm.IdentityManager;
 import org.picketlink.idm.model.Group;
 import org.picketlink.idm.model.Role;
+import org.picketlink.idm.model.SimpleGroup;
+import org.picketlink.idm.model.SimpleRole;
+import org.picketlink.idm.model.SimpleUser;
 import org.picketlink.idm.model.User;
 import org.picketlink.social.standalone.oauth.OpenIdPrincipal;
 
@@ -59,7 +62,7 @@ public class OpenIDSignInEndpoint {
     private PicketBoxIdentity identity;
 
     @Inject
-    private LoginCredentials credential;
+    private LoginCredential credential;
 
     @Inject
     private IdentityManager identityManager;
@@ -97,18 +100,23 @@ public class OpenIDSignInEndpoint {
         User storedUser = identityManager.getUser(openIDPrincipal.getName());
 
         if (storedUser == null) {
-            storedUser = identityManager.createUser(openIDPrincipal.getFullName());
+            storedUser = new SimpleUser(openIDPrincipal.getFullName());
+            
             storedUser.setFirstName(openIDPrincipal.getFirstName());
             storedUser.setLastName(openIDPrincipal.getLastName());
-            storedUser.setEmail(openIDPrincipal.getEmail());
+            storedUser.setEmail(openIDPrincipal.getEmail()); 
 
-            // necessary because we need to show the user info at the main page. Otherwise the informations will be show only
-            // after the second login.
-            Role guest = this.identityManager.createRole("guest");
+            identityManager.add(storedUser);
+            
+            Role guest = new SimpleRole("guest");
+            
+            this.identityManager.add(guest);
 
-            Group guests = identityManager.createGroup("Guests");
+            Group guests = new SimpleGroup("Guests");
+            
+            identityManager.add(guests);
 
-            identityManager.grantRole(guest, storedUser, guests);
+            identityManager.grantRole(storedUser, guest);
 
             UserContext subject = this.identity.getUserContext();
 

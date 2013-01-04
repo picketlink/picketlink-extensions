@@ -39,6 +39,9 @@ import org.picketbox.core.exceptions.AuthenticationException;
 import org.picketlink.idm.IdentityManager;
 import org.picketlink.idm.model.Group;
 import org.picketlink.idm.model.Role;
+import org.picketlink.idm.model.SimpleGroup;
+import org.picketlink.idm.model.SimpleRole;
+import org.picketlink.idm.model.SimpleUser;
 import org.picketlink.idm.model.User;
 import org.picketlink.social.standalone.fb.FacebookProcessor;
 
@@ -130,14 +133,24 @@ public class TwitterAuthenticationMechanism extends AbstractAuthenticationMechan
             User newUser = null;
             
             User storedUser = identityManager.getUser(twitterPrincipal.getName());
+            
             if(storedUser == null){ 
-                newUser = identityManager.createUser(twitterPrincipal.getName());
+                newUser = new SimpleUser(twitterPrincipal.getName());
+                
                 newUser.setFirstName(twitterPrincipal.getName());
+                
+                identityManager.add(newUser);
+                
+                Role guest = new SimpleRole("guest");
+                
+                this.identityManager.add(guest);
+                
+                Group guests = new SimpleGroup("Guests");
+                
+                identityManager.add(guests);
 
-                Role guest = this.identityManager.createRole("guest");
-                Group guests = identityManager.createGroup("Guests");
-
-                identityManager.grantRole(guest, newUser, guests);
+                identityManager.grantRole(newUser, guest);
+                identityManager.addToGroup(newUser, guests);
             }
         }
     }
