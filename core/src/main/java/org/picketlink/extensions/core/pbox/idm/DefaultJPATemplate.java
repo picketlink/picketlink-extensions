@@ -58,6 +58,9 @@ public class DefaultJPATemplate extends JPATemplate {
         } catch (Exception e) {
 
         }
+        if(entityManager == null){
+            throw new IllegalStateException("Entity Manager has not been injected");
+        }
 
         return entityManager;
     }
