@@ -30,7 +30,7 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
- 
+
 import org.picketbox.core.authentication.credential.UsernamePasswordCredential;
 import org.picketbox.jaxrs.model.AuthenticationRequest;
 import org.picketbox.jaxrs.model.AuthenticationResponse;
@@ -47,7 +47,7 @@ import org.picketlink.extensions.core.pbox.PicketBoxIdentity;
 @Path("/signin")
 @TransactionAttribute
 public class SignInEndpoint {
-
+    
     @Inject
     private PicketBoxIdentity identity;
     

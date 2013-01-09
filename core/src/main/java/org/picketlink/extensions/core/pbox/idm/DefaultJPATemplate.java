@@ -23,9 +23,9 @@
 package org.picketlink.extensions.core.pbox.idm;
 
 import javax.enterprise.context.ApplicationScoped;
-import javax.enterprise.inject.Instance;
-import javax.inject.Inject;
 import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.persistence.PersistenceContextType;
 
 import org.picketlink.idm.jpa.schema.internal.JPATemplate;
 
@@ -41,8 +41,8 @@ import org.picketlink.idm.jpa.schema.internal.JPATemplate;
 @ApplicationScoped
 public class DefaultJPATemplate extends JPATemplate {
 
-    @Inject
-    private Instance<EntityManager> entityManager;
+    @PersistenceContext(type = PersistenceContextType.EXTENDED)
+    private EntityManager entityManager;
 
     /*
      * (non-Javadoc)
@@ -51,13 +51,6 @@ public class DefaultJPATemplate extends JPATemplate {
      */
     @Override
     protected EntityManager getEntityManager() {
-        EntityManager entityManager = null;
-
-        try {
-            entityManager = this.entityManager.get();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
         if(entityManager == null){
             throw new IllegalStateException("Entity Manager has not been injected");
         }
