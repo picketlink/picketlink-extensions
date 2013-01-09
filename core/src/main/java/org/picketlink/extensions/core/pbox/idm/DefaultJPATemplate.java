@@ -56,7 +56,7 @@ public class DefaultJPATemplate extends JPATemplate {
         try {
             entityManager = this.entityManager.get();
         } catch (Exception e) {
-
+            throw new RuntimeException(e);
         }
         if(entityManager == null){
             throw new IllegalStateException("Entity Manager has not been injected");
