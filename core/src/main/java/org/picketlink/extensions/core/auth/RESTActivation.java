@@ -22,20 +22,15 @@
 package org.picketlink.extensions.core.auth;
 
 import javax.enterprise.context.ApplicationScoped;
-import javax.enterprise.inject.Produces;
-
-import org.picketbox.core.authentication.impl.OTPAuthenticationMechanism;
+import javax.ws.rs.ApplicationPath;
+import javax.ws.rs.core.Application;
 
 /**
- * Produces {@link OTPAuthenticationMechanism}
+ * Activate JAX-RS
  * @author anil saldhana
- * @since Oct 10, 2012
+ * @since Jan 8, 2013
  */
-public class OTPAuthenticationMechanismProducer {
-
-    @Produces
-    @ApplicationScoped
-    public OTPAuthenticationMechanism produceMechanism(){
-        return new OTPAuthenticationMechanism();
-    }
+@ApplicationPath("/")
+@ApplicationScoped
+public class RESTActivation extends Application{
 }
