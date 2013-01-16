@@ -22,6 +22,7 @@
 
 package org.picketlink.extensions.core.interceptors;
 
+import java.util.Arrays;
 import java.util.List;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -37,8 +38,10 @@ import org.jboss.resteasy.spi.HttpRequest;
 import org.jboss.resteasy.spi.interception.PreProcessInterceptor;
 import org.picketbox.jaxrs.model.AuthenticationResponse;
 import org.picketlink.authentication.AuthenticationException;
+import org.picketlink.extensions.core.auth.AccountRegistrationEndpoint;
 import org.picketlink.extensions.core.auth.LogoutEndpoint;
 import org.picketlink.extensions.core.auth.SignInEndpoint;
+import org.picketlink.extensions.core.auth.UserInfoEndpoint;
 import org.picketlink.extensions.core.pbox.PicketBoxIdentity;
 
 /**
@@ -118,9 +121,10 @@ public class SecurityInterceptor implements PreProcessInterceptor {
     private boolean requiresAuthentication(ResourceMethod method) {
         Class<?> declaringClass = method.getMethod().getDeclaringClass();
         
-        Class<?> sign = SignInEndpoint.class;
-        Class<?> logout = LogoutEndpoint.class;
+        Class<?>[] arr = new Class[] { SignInEndpoint.class, LogoutEndpoint.class, AccountRegistrationEndpoint.class, UserInfoEndpoint.class};
         
-        return !(declaringClass.equals(sign) || declaringClass.equals(logout));
+        List<Class<?>> classes = Arrays.asList(arr);
+        
+        return classes.contains(declaringClass) == false;
     }
 }
