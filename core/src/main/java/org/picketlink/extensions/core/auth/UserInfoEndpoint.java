@@ -53,25 +53,25 @@ public class UserInfoEndpoint {
     @Produces (MediaType.APPLICATION_JSON)
     public UserInfo getInfo() {
         UserInfo userInfo = new UserInfo();
-        
-        User user = this.identity.getUser();
-        userInfo.setUserId(user.getId());
-        userInfo.setFullName(user.getFirstName() + " " + user.getLastName());
-        
-        UserContext userContext = this.identity.getUserContext();
-        
-        Collection<Role> roles = userContext.getRoles();
-        String[] rolesArray = new String[roles.size()];
-        
-        int i = 0;
-        
-        for (Role role : roles) {
-            rolesArray[i] = role.getName();
-            i++;
+        if(identity.isLoggedIn()){            
+            User user = this.identity.getUser();
+            userInfo.setUserId(user.getId());
+            userInfo.setFullName(user.getFirstName() + " " + user.getLastName());
+            
+            UserContext userContext = this.identity.getUserContext();
+            
+            Collection<Role> roles = userContext.getRoles();
+            String[] rolesArray = new String[roles.size()];
+            
+            int i = 0;
+            
+            for (Role role : roles) {
+                rolesArray[i] = role.getName();
+                i++;
+            }
+            
+            userInfo.setRoles(rolesArray);
         }
-        
-        userInfo.setRoles(rolesArray);
-        
         return userInfo;
     }
     
