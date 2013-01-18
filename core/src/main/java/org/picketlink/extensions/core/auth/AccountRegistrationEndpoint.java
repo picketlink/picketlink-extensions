@@ -78,7 +78,7 @@ public class AccountRegistrationEndpoint {
         EntityManagerPropagationContext.set(entityManager);
         identityManager = picketboxManager.getIdentityManager();
         
-        IdentityQuery<User> query = identityManager.createQuery(User.class);
+        IdentityQuery<User> query = identityManager.createIdentityQuery(User.class);
         query.setParameter(User.ID , userName);
         
         List<User> users = query.getResultList();
@@ -86,6 +86,7 @@ public class AccountRegistrationEndpoint {
         if(size >0){
             response.setRegistered(true);
         }
+        EntityManagerPropagationContext.clear();
         return response;
     }
     
@@ -105,7 +106,7 @@ public class AccountRegistrationEndpoint {
         EntityManagerPropagationContext.set(entityManager);
         identityManager = picketboxManager.getIdentityManager();
         
-        IdentityQuery<User> query = identityManager.createQuery(User.class);
+        IdentityQuery<User> query = identityManager.createIdentityQuery(User.class);
         query.setParameter(User.ID , userName);
         
         List<User> users = query.getResultList();
@@ -133,6 +134,7 @@ public class AccountRegistrationEndpoint {
         } else {
             response.setStatus("UserName already taken. Choose another name!");
         }
+        EntityManagerPropagationContext.clear();
         return response;
     }
 }

@@ -55,7 +55,7 @@ public class UserInfoEndpoint {
         UserInfo userInfo = new UserInfo();
         if(identity.isLoggedIn()){            
             User user = this.identity.getUser();
-            userInfo.setUserId(user.getId());
+            userInfo.setUserId(user.getLoginName());
             userInfo.setFullName(user.getFirstName() + " " + user.getLastName());
             
             UserContext userContext = this.identity.getUserContext();
