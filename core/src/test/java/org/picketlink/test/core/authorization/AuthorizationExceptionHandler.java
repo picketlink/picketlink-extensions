@@ -20,30 +20,26 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-package org.picketlink.test.core.authentication;
+package org.picketlink.test.core.authorization;
 
 import javax.enterprise.context.ApplicationScoped;
-import javax.enterprise.inject.Produces;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response.ResponseBuilder;
 
-import org.picketbox.core.PicketBoxManager;
-import org.picketbox.core.config.ConfigurationBuilder;
+import org.apache.deltaspike.core.api.exception.control.annotation.ExceptionHandler;
+import org.apache.deltaspike.core.api.exception.control.annotation.Handles;
+import org.apache.deltaspike.core.api.exception.control.event.ExceptionEvent;
 
 /**
- * <p>Bean responsible for produce the {@link ConfigurationBuilder}. This configuration will be used during the {@link PicketBoxManager} startup.</p>
- *
  * @author <a href="mailto:psilva@redhat.com">Pedro Silva</a>
  *
  */
 @ApplicationScoped
-public class PicketBoxConfigurer {
+@ExceptionHandler
+public class AuthorizationExceptionHandler {
 
-    @Produces
-    public ConfigurationBuilder createConfiguration() {
-        ConfigurationBuilder builder = new ConfigurationBuilder();
-
-        builder.identityManager().fileStore().preserveState();
-
-        return builder;
-    }
-
+    public void handleException(@Handles ExceptionEvent<Throwable> evt) {
+        System.out.println(evt.getException());
+    }    
+    
 }

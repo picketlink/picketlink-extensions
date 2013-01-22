@@ -28,10 +28,11 @@ import javax.inject.Inject;
 
 import org.junit.After;
 import org.junit.Before;
+import org.picketbox.cdi.test.arquillian.AbstractArquillianTestCase;
+import org.picketbox.core.PicketBoxManager;
 import org.picketbox.core.authentication.credential.UsernamePasswordCredential;
 import org.picketlink.Identity;
-import org.picketlink.credential.internal.DefaultLoginCredentials;
-import org.picketlink.test.core.arquillian.AbstractArquillianTestCase;
+import org.picketlink.extensions.core.pbox.LoginCredential;
 
 /**
  * <p>Base class for test cases that needs to have an authenticated user during the tests.</p>
@@ -48,7 +49,10 @@ public abstract class AbstractAuthenticationTestCase extends AbstractArquillianT
     protected Identity identity;
 
     @Inject
-    protected DefaultLoginCredentials credential;
+    protected LoginCredential credential;
+    
+    @Inject
+    private PicketBoxManager picketBoxManager;
 
     /**
      * <p>Authenticates the user</p>
@@ -60,7 +64,6 @@ public abstract class AbstractAuthenticationTestCase extends AbstractArquillianT
         populateUserCredential();
         this.identity.login();
         assertTrue(this.identity.isLoggedIn());
-
     }
 
     /**
@@ -77,7 +80,6 @@ public abstract class AbstractAuthenticationTestCase extends AbstractArquillianT
      * </p>
      */
     private void populateUserCredential() {
-        this.credential.setUserId(USER_NAME);
         this.credential.setCredential(new UsernamePasswordCredential(USER_NAME, USER_PASSWORD));
     }
 

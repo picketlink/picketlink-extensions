@@ -28,10 +28,9 @@ import junit.framework.Assert;
 
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
-import org.junit.Ignore;
 import org.junit.Test;
+import org.picketbox.cdi.test.arquillian.ArchiveUtil;
 import org.picketlink.idm.model.User;
-import org.picketlink.test.core.arquillian.ArchiveUtil;
 
 /**
  * <p>
@@ -41,7 +40,6 @@ import org.picketlink.test.core.arquillian.ArchiveUtil;
  * @author <a href="mailto:psilva@redhat.com">Pedro Silva</a>
  *
  */
-@Ignore
 public class AuthenticationTestCase extends AbstractAuthenticationTestCase {
 
     @Inject
@@ -73,7 +71,7 @@ public class AuthenticationTestCase extends AbstractAuthenticationTestCase {
         User user = this.whoAmIService.whoAmI();
 
         Assert.assertNotNull(user);
-        Assert.assertEquals(USER_NAME, user.getId());
+        Assert.assertEquals(USER_NAME, user.getLoginName());
     }
 
 }
