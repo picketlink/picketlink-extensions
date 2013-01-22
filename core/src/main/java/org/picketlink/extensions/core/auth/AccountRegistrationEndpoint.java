@@ -41,7 +41,7 @@ import org.picketbox.core.identity.jpa.EntityManagerPropagationContext;
 import org.picketbox.jaxrs.model.AccountRegistrationRequest;
 import org.picketbox.jaxrs.model.AccountRegistrationResponse;
 import org.picketlink.idm.IdentityManager;
-import org.picketlink.idm.credential.Password;
+import org.picketlink.idm.credential.internal.Password;
 import org.picketlink.idm.model.Attribute;
 import org.picketlink.idm.model.SimpleUser;
 import org.picketlink.idm.model.User;
