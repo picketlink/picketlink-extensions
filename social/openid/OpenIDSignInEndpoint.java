@@ -35,10 +35,10 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 
-import org.aerogear.todo.server.security.authc.AuthenticationResponse;
-import org.picketbox.cdi.LoginCredential;
-import org.picketbox.cdi.PicketBoxIdentity;
 import org.picketbox.core.UserContext;
+import org.picketbox.jaxrs.model.AuthenticationResponse;
+import org.picketlink.extensions.core.pbox.LoginCredential;
+import org.picketlink.extensions.core.pbox.PicketBoxIdentity;
 import org.picketlink.idm.IdentityManager;
 import org.picketlink.idm.model.Group;
 import org.picketlink.idm.model.Role;

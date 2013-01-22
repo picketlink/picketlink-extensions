@@ -31,10 +31,10 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
-import org.aerogear.todo.server.security.idm.UserInfo;
-import org.picketbox.cdi.PicketBoxIdentity;
 import org.picketbox.core.UserContext;
 import org.picketbox.core.util.Base32;
+import org.picketlink.extensions.core.auth.UserInfo;
+import org.picketlink.extensions.core.pbox.PicketBoxIdentity;
 import org.picketlink.idm.IdentityManager;
 import org.picketlink.idm.model.Attribute;
 import org.picketlink.idm.model.Role;
@@ -77,7 +77,7 @@ public class OTPSerialNumberEndpoint {
         
         userInfo.setRoles(rolesArray);
         
-        User idmuser = identityManager.getUser(user.getId());
+        User idmuser = identityManager.getUser(user.getLoginName());
         Attribute<String> attribute = idmuser.getAttribute("serial");
         
         if(attribute == null){

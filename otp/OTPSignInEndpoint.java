@@ -31,11 +31,11 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
-import org.aerogear.todo.server.security.authc.AuthenticationRequest;
-import org.aerogear.todo.server.security.authc.AuthenticationResponse;
-import org.picketbox.cdi.LoginCredential;
-import org.picketbox.cdi.PicketBoxIdentity;
 import org.picketbox.core.authentication.credential.OTPCredential;
+import org.picketbox.jaxrs.model.AuthenticationRequest;
+import org.picketbox.jaxrs.model.AuthenticationResponse;
+import org.picketlink.extensions.core.pbox.LoginCredential;
+import org.picketlink.extensions.core.pbox.PicketBoxIdentity;
 
 /**
  * <p>JAX-RS Endpoint to authenticate users using otp.</p>
