@@ -27,15 +27,12 @@ import javax.enterprise.inject.spi.BeanManager;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.jboss.logging.Logger;
 import org.picketbox.core.PicketBoxManager;
 import org.picketbox.core.UserContext;
-import org.picketbox.core.UserCredential;
 import org.picketbox.core.session.DefaultSessionId;
 import org.picketlink.Identity;
 import org.picketlink.authentication.AuthenticationException;
 import org.picketlink.authentication.event.LoginFailedEvent;
-import org.picketlink.credential.internal.DefaultLoginCredentials;
 import org.picketlink.idm.model.User;
 import org.picketlink.internal.DefaultIdentity;
 
@@ -53,14 +50,12 @@ import org.picketlink.internal.DefaultIdentity;
 public class PicketBoxIdentity extends DefaultIdentity {
 
     private static final long serialVersionUID = -290838764498141080L;
-    
-    private Logger log = Logger.getLogger(Logger.class);
 
     @Inject
     private BeanManager beanManager;
 
     @Inject
-    private DefaultLoginCredentials credential;
+    private LoginCredential credential;
 
     @Inject
     private PicketBoxManager picketBoxManager;
@@ -101,14 +96,13 @@ public class PicketBoxIdentity extends DefaultIdentity {
             }
 
             if (sessionId == null) {
-                authenticationUserContext.setCredential((UserCredential) this.credential.getCredential());
+                authenticationUserContext.setCredential(this.credential.getCredential());
             }
 
             subject = this.picketBoxManager.authenticate(authenticationUserContext);
         } catch (Exception e) {
-            log.error("Authentication Exception:", e);
             this.beanManager.fireEvent(new LoginFailedEvent(e));
-            throw new AuthenticationException(e.getMessage(),e);
+            throw new AuthenticationException(e.getMessage());
         }
 
         if (subject != null && subject.isAuthenticated()) {
@@ -171,5 +165,9 @@ public class PicketBoxIdentity extends DefaultIdentity {
 
     public UserContext getUserContext() {
         return this.subject;
+    }
+
+    public boolean hasGroup(String name) {
+        return isLoggedIn() && this.subject.hasGroup(name);
     }
 }

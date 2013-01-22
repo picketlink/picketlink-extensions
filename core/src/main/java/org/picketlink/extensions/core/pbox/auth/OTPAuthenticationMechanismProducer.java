@@ -19,31 +19,23 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-
-package org.picketlink.test.core.authentication;
+package org.picketlink.extensions.core.pbox.auth;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.inject.Produces;
 
-import org.picketbox.core.PicketBoxManager;
-import org.picketbox.core.config.ConfigurationBuilder;
+import org.picketbox.core.authentication.impl.OTPAuthenticationMechanism;
 
 /**
- * <p>Bean responsible for produce the {@link ConfigurationBuilder}. This configuration will be used during the {@link PicketBoxManager} startup.</p>
- *
- * @author <a href="mailto:psilva@redhat.com">Pedro Silva</a>
- *
+ * Produces {@link OTPAuthenticationMechanism}
+ * @author anil saldhana
+ * @since Oct 10, 2012
  */
-@ApplicationScoped
-public class PicketBoxConfigurer {
+public class OTPAuthenticationMechanismProducer {
 
     @Produces
-    public ConfigurationBuilder createConfiguration() {
-        ConfigurationBuilder builder = new ConfigurationBuilder();
-
-        builder.identityManager().fileStore().preserveState();
-
-        return builder;
+    @ApplicationScoped
+    public OTPAuthenticationMechanism produceMechanism(){
+        return new OTPAuthenticationMechanism();
     }
-
 }

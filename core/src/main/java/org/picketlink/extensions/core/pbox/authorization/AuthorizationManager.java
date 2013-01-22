@@ -22,13 +22,14 @@
 
 package org.picketlink.extensions.core.pbox.authorization;
 
+import static org.picketlink.extensions.core.pbox.util.AnnotationUtil.getDeclaredAnnotation;
+
 import javax.enterprise.context.ApplicationScoped;
 import javax.interceptor.InvocationContext;
 
 import org.apache.deltaspike.security.api.authorization.annotation.Secures;
 import org.picketlink.Identity;
 import org.picketlink.extensions.core.pbox.PicketBoxIdentity;
-import org.picketlink.extensions.core.pbox.util.AnnotationUtil;
 
 /**
  * <p>
@@ -92,7 +93,7 @@ public class AuthorizationManager {
      * @return
      */
     private String[] getRestrictedRoles(InvocationContext ctx) {
-        RolesAllowed restrictedRolesAnnotation = AnnotationUtil.getDeclaredAnnotation(RolesAllowed.class, ctx);
+        RolesAllowed restrictedRolesAnnotation = getDeclaredAnnotation(RolesAllowed.class, ctx);
 
         if (restrictedRolesAnnotation != null) {
             return restrictedRolesAnnotation.value();

@@ -28,9 +28,8 @@ import junit.framework.Assert;
 
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
-import org.junit.Ignore;
 import org.junit.Test;
-import org.picketlink.test.core.arquillian.ArchiveUtil;
+import org.picketbox.cdi.test.arquillian.ArchiveUtil;
 
 /**
  * <p>
@@ -40,7 +39,6 @@ import org.picketlink.test.core.arquillian.ArchiveUtil;
  * @author <a href="mailto:psilva@redhat.com">Pedro Silva</a>
  *
  */
-@Ignore
 public class AuthenticationEventHandlerTestCase extends AbstractAuthenticationTestCase {
 
     @Inject

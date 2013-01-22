@@ -38,7 +38,7 @@ import org.picketbox.core.authentication.credential.UsernamePasswordCredential;
 import org.picketbox.core.identity.jpa.EntityManagerPropagationContext;
 import org.picketbox.jaxrs.model.AuthenticationRequest;
 import org.picketbox.jaxrs.model.AuthenticationResponse;
-import org.picketlink.credential.internal.DefaultLoginCredentials;
+import org.picketlink.extensions.core.pbox.LoginCredential;
 import org.picketlink.extensions.core.pbox.PicketBoxIdentity;
 
 /**
@@ -56,7 +56,7 @@ public class SignInEndpoint {
     private PicketBoxIdentity identity;
     
     @Inject
-    private DefaultLoginCredentials credential;
+    private LoginCredential credential;
     
 
     @PersistenceContext(type = PersistenceContextType.EXTENDED)
