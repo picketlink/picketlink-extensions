@@ -81,6 +81,7 @@ public class SignInEndpoint {
         EntityManagerPropagationContext.set(entityManager);
         this.identity.login();
 
+        EntityManagerPropagationContext.clear();
         return createResponse(authcRequest);
     }
 
