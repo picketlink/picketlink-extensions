@@ -27,7 +27,6 @@ import javax.enterprise.inject.Produces;
 
 import org.picketbox.core.PicketBoxManager;
 import org.picketbox.core.config.ConfigurationBuilder;
-import org.picketlink.extensions.core.pbox.util.IdentityManagerInitializer;
 
 /**
  * <p>Bean responsible for produce the {@link ConfigurationBuilder}. This configuration will be used during the {@link PicketBoxManager} startup.</p>
@@ -40,13 +39,7 @@ public class PicketBoxConfigurer {
 
     @Produces
     public ConfigurationBuilder createConfiguration() {
-        ConfigurationBuilder builder = new ConfigurationBuilder();
-
-        builder.identityManager().fileStore().preserveState();
-
-        IdentityManagerInitializer.initializeIdentityStore();
-
-        return builder;
+        return new ConfigurationBuilder();
     }
 
 }

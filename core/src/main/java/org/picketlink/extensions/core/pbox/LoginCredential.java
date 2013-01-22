@@ -20,30 +20,29 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-package org.picketlink.test.core.authentication;
+package org.picketlink.extensions.core.pbox;
 
-import javax.enterprise.context.ApplicationScoped;
-import javax.enterprise.inject.Produces;
+import javax.enterprise.context.RequestScoped;
+import javax.inject.Named;
 
-import org.picketbox.core.PicketBoxManager;
-import org.picketbox.core.config.ConfigurationBuilder;
+import org.picketbox.core.UserCredential;
 
 /**
- * <p>Bean responsible for produce the {@link ConfigurationBuilder}. This configuration will be used during the {@link PicketBoxManager} startup.</p>
- *
  * @author <a href="mailto:psilva@redhat.com">Pedro Silva</a>
  *
  */
-@ApplicationScoped
-public class PicketBoxConfigurer {
+@Named("loginCredential")
+@RequestScoped
+public class LoginCredential {
 
-    @Produces
-    public ConfigurationBuilder createConfiguration() {
-        ConfigurationBuilder builder = new ConfigurationBuilder();
+    private UserCredential credential;
 
-        builder.identityManager().fileStore().preserveState();
+    public UserCredential getCredential() {
+        return credential;
+    }
 
-        return builder;
+    public void setCredential(UserCredential credential) {
+        this.credential = credential;
     }
 
 }

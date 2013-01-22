@@ -20,30 +20,41 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-package org.picketlink.test.core.authentication;
+package org.picketlink.extensions.core.pbox.idm;
 
 import javax.enterprise.context.ApplicationScoped;
-import javax.enterprise.inject.Produces;
+import javax.enterprise.inject.Instance;
+import javax.inject.Inject;
+import javax.persistence.EntityManager;
 
-import org.picketbox.core.PicketBoxManager;
-import org.picketbox.core.config.ConfigurationBuilder;
+import org.picketbox.core.identity.jpa.EntityManagerLookupStrategy;
 
 /**
- * <p>Bean responsible for produce the {@link ConfigurationBuilder}. This configuration will be used during the {@link PicketBoxManager} startup.</p>
+ * <p>
+ * Custom {@link JPATemplate} to be used during the JPA Identity Store configuration. This bean automatically inject the
+ * {@link EntityManager} instance to be used during the IDM operations.
+ * </p>
  *
- * @author <a href="mailto:psilva@redhat.com">Pedro Silva</a>
+ * @author pedroigor
  *
  */
 @ApplicationScoped
-public class PicketBoxConfigurer {
+public class DefaultEntityManagerLookupStrategy extends EntityManagerLookupStrategy {
 
-    @Produces
-    public ConfigurationBuilder createConfiguration() {
-        ConfigurationBuilder builder = new ConfigurationBuilder();
+    @Inject
+    private Instance<EntityManager> entityManager;
 
-        builder.identityManager().fileStore().preserveState();
+    @Override
+    protected EntityManager lookupEntityManager() {
+        EntityManager entityManager = null;
 
-        return builder;
+        try {
+            entityManager = this.entityManager.get();
+        } catch (Exception e) {
+
+        }
+
+        return entityManager;
     }
 
 }
