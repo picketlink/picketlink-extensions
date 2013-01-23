@@ -26,14 +26,12 @@ import java.util.List;
 import javax.ejb.Stateless;
 import javax.inject.Inject;
 import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
-import org.picketbox.core.PicketBoxManager;
 import org.picketbox.jaxrs.model.AccountRegistrationRequest;
 import org.picketbox.jaxrs.model.AccountRegistrationResponse;
 import org.picketlink.idm.IdentityManager;
@@ -45,92 +43,86 @@ import org.picketlink.idm.query.IdentityQuery;
 
 /**
  * Endpoint for User Account Registration
+ * 
  * @author anil saldhana
  * @since Jan 16, 2013
  */
 @Stateless
 @Path("/accregister")
-public class AccountRegistrationEndpoint {   
+public class AccountRegistrationEndpoint {
 
-    @Inject 
-    private PicketBoxManager picketboxManager;
-    
+    @Inject
     private IdentityManager identityManager;
 
-//    @PersistenceContext(type = PersistenceContextType.EXTENDED)
-//    private EntityManager entityManager;
+    // @PersistenceContext(type = PersistenceContextType.EXTENDED)
+    // private EntityManager entityManager;
 
     /**
      * Check if an UserName is already taken
+     * 
      * @param userName
      * @return
      */
-    @GET
+    @POST
     @Produces(MediaType.APPLICATION_JSON)
-    public AccountRegistrationResponse alreadyExists(@QueryParam("id") String userName){
+    public AccountRegistrationResponse alreadyExists(@QueryParam("userName") String userName) {
 
         AccountRegistrationResponse response = new AccountRegistrationResponse();
 
-//        EntityManagerPropagationContext.set(entityManager);
-        identityManager = picketboxManager.getIdentityManager();
-        
-        IdentityQuery<User> query = identityManager.createIdentityQuery(User.class);
-        query.setParameter(User.ID , userName);
-        
-        List<User> users = query.getResultList();
-        int size = users.size();
-        if(size >0){
+        // EntityManagerPropagationContext.set(entityManager);
+        // identityManager = picketboxManager.getIdentityManager();
+
+        if (identityManager.getUser(userName) != null) {
             response.setRegistered(true);
         }
-//        EntityManagerPropagationContext.clear();
+        // EntityManagerPropagationContext.clear();
         return response;
     }
-    
+
     /**
      * Register an user account
+     * 
      * @param request
      * @return
      */
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public AccountRegistrationResponse register(AccountRegistrationRequest request){
+    public AccountRegistrationResponse register(AccountRegistrationRequest request) {
         AccountRegistrationResponse response = new AccountRegistrationResponse();
-        
+
         String userName = request.getUserName();
-        
-//        EntityManagerPropagationContext.set(entityManager);
-        identityManager = picketboxManager.getIdentityManager();
-        
+
+        // EntityManagerPropagationContext.set(entityManager);
         IdentityQuery<User> query = identityManager.createIdentityQuery(User.class);
-        query.setParameter(User.ID , userName);
-        
+        query.setParameter(User.ID, userName);
+
         List<User> users = query.getResultList();
         int size = users.size();
-        
-        if(size == 0){
-            //UserName is not already registered
+
+        if (size == 0) {
+            // UserName is not already registered
             User user = new SimpleUser(userName);
             user.setEmail(request.getEmail());
             user.setFirstName(request.getFirstName());
             user.setLastName(request.getLastName());
 
-            user.setAttribute( new Attribute<String>("address", request.getAddress()) );
-            user.setAttribute( new Attribute<String>("city", request.getCity()) );
-            user.setAttribute( new Attribute<String>("state", request.getState()) );
-            user.setAttribute( new Attribute<String>("postalCode", request.getPostalCode()) );
-            user.setAttribute( new Attribute<String>("country", request.getCountry()) );
-            
+            user.setAttribute(new Attribute<String>("address", request.getAddress()));
+            user.setAttribute(new Attribute<String>("city", request.getCity()));
+            user.setAttribute(new Attribute<String>("state", request.getState()));
+            user.setAttribute(new Attribute<String>("postalCode", request.getPostalCode()));
+            user.setAttribute(new Attribute<String>("country", request.getCountry()));
+
             identityManager.add(user);
-            
+
             identityManager.updateCredential(user, new Password(request.getPassword()));
             response.setStatus("Registered");
             response.setRegistered(true);
-            
+
         } else {
             response.setStatus("UserName already taken. Choose another name!");
         }
-//        EntityManagerPropagationContext.clear();
+        // EntityManagerPropagationContext.clear();
         return response;
     }
 }
