@@ -53,6 +53,7 @@ public class ArchiveUtil {
         WebArchive archive = ShrinkWrap
                 .create(WebArchive.class, "test.jar")
                 .addAsManifestResource(getBeansXml(), ArchivePaths.create("beans.xml"))
+                .addClass(IdentityManagerInitializer.class)
                 .addPackages(true, new Filter<ArchivePath>() {
                     @Override
                     public boolean include(ArchivePath object) {
