@@ -63,26 +63,26 @@ public class ArchiveUtil {
                                 JavaArchive.class,
                                 DependencyResolvers.use(MavenDependencyResolver.class)
                                         .loadMetadataFromPom("pom.xml")
-                                        .artifact("org.apache.deltaspike.modules:deltaspike-security-module-impl").goOffline()
+                                        .artifact("org.apache.deltaspike.modules:deltaspike-security-module-impl")
                                         .resolveAsFiles()[0]))
                 .addAsLibraries(
                         ShrinkWrap.createFromZipFile(
                                 JavaArchive.class,
                                 DependencyResolvers.use(MavenDependencyResolver.class)
                                         .loadMetadataFromPom("pom.xml")
-                                        .artifact("org.picketlink:picketlink-core-impl").goOffline()
+                                        .artifact("org.picketlink:picketlink-core-impl")
                                         .resolveAsFiles()[0]))
                 .addAsLibraries(
                         ShrinkWrap.createFromZipFile(
                                 JavaArchive.class,
                                 DependencyResolvers.use(MavenDependencyResolver.class)
                                         .loadMetadataFromPom("pom.xml")
-                                        .artifact("org.picketlink:picketlink-core-api").goOffline()
+                                        .artifact("org.picketlink:picketlink-core-api")
                                         .resolveAsFiles()[0]))
                 .addAsLibraries(
                         ShrinkWrap.createFromZipFile(
                                 JavaArchive.class,
-                                DependencyResolvers.use(MavenDependencyResolver.class).goOffline()
+                                DependencyResolvers.use(MavenDependencyResolver.class)
                                         .loadMetadataFromPom("pom.xml")
                                         .artifact("org.picketbox:picketbox-core")
                                         .resolveAsFiles()[0]));
