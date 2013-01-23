@@ -25,9 +25,6 @@ package org.picketlink.extensions.core.auth;
 import javax.ejb.Stateless;
 import javax.ejb.TransactionAttribute;
 import javax.inject.Inject;
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
-import javax.persistence.PersistenceContextType;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -35,7 +32,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 import org.picketbox.core.authentication.credential.UsernamePasswordCredential;
-import org.picketbox.core.identity.jpa.EntityManagerPropagationContext;
 import org.picketbox.jaxrs.model.AuthenticationRequest;
 import org.picketbox.jaxrs.model.AuthenticationResponse;
 import org.picketlink.extensions.core.pbox.LoginCredential;
@@ -76,7 +72,7 @@ public class SignInEndpoint {
             return createResponse(authcRequest);
         }
         
-        credential.setCredential(new UsernamePasswordCredential(authcRequest.getUserId(), authcRequest.getPassword()));
+        this.credential.setCredential(new UsernamePasswordCredential(authcRequest.getUserId(), authcRequest.getPassword()));
 
 //        EntityManagerPropagationContext.set(entityManager);
         this.identity.login();

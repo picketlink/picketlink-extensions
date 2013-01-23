@@ -25,7 +25,6 @@ package org.picketlink.extensions.core.auth;
 import javax.ejb.Stateless;
 import javax.inject.Inject;
 import javax.ws.rs.GET;
-import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
@@ -57,13 +56,10 @@ public class CheckUserNameEndpoint {
 
         AccountRegistrationResponse response = new AccountRegistrationResponse();
 
-        // EntityManagerPropagationContext.set(entityManager);
-        // identityManager = picketboxManager.getIdentityManager();
-
-        if (identityManager.getUser(userName) != null) {
+        if (this.identityManager.getUser(userName) != null) {
             response.setRegistered(true);
         }
-        // EntityManagerPropagationContext.clear();
+        
         return response;
     }
     

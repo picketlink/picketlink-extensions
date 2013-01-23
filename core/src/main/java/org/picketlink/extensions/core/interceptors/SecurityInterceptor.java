@@ -39,6 +39,7 @@ import org.jboss.resteasy.spi.interception.PreProcessInterceptor;
 import org.picketbox.jaxrs.model.AuthenticationResponse;
 import org.picketlink.authentication.AuthenticationException;
 import org.picketlink.extensions.core.auth.AccountRegistrationEndpoint;
+import org.picketlink.extensions.core.auth.CheckUserNameEndpoint;
 import org.picketlink.extensions.core.auth.LogoutEndpoint;
 import org.picketlink.extensions.core.auth.SignInEndpoint;
 import org.picketlink.extensions.core.auth.UserInfoEndpoint;
@@ -49,7 +50,9 @@ import org.picketlink.extensions.core.pbox.PicketBoxIdentity;
  * Implementation of {@link PreProcessInterceptor} that checks the existence of the authentication token before invoking the
  * destination endpoint.
  * </p>
- * <p>If the token is valid, the {@link PicketBoxIdentity} will restored with the all user information.</p>
+ * <p>
+ * If the token is valid, the {@link PicketBoxIdentity} will restored with the all user information.
+ * </p>
  * 
  * @author <a href="mailto:psilva@redhat.com">Pedro Silva</a>
  * 
@@ -62,8 +65,11 @@ public class SecurityInterceptor implements PreProcessInterceptor {
     @Inject
     private PicketBoxIdentity identity;
 
-    /* (non-Javadoc)
-     * @see org.jboss.resteasy.spi.interception.PreProcessInterceptor#preProcess(org.jboss.resteasy.spi.HttpRequest, org.jboss.resteasy.core.ResourceMethod)
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.jboss.resteasy.spi.interception.PreProcessInterceptor#preProcess(org.jboss.resteasy.spi.HttpRequest,
+     * org.jboss.resteasy.core.ResourceMethod)
      */
     @Override
     public ServerResponse preProcess(HttpRequest request, ResourceMethod method) throws Failure, WebApplicationException {
@@ -72,7 +78,7 @@ public class SecurityInterceptor implements PreProcessInterceptor {
         if (requiresAuthentication(method) && !this.identity.isLoggedIn()) {
             boolean isLoggedIn = false;
             String token = getToken(request);
-            
+
             if (token != null) {
                 try {
                     isLoggedIn = identity.restoreSession(token);
@@ -83,9 +89,9 @@ public class SecurityInterceptor implements PreProcessInterceptor {
 
             if (!isLoggedIn) {
                 AuthenticationResponse authcResponse = new AuthenticationResponse();
-                
+
                 authcResponse.setLoggedIn(false);
-                
+
                 response = new ServerResponse();
                 response.setEntity(authcResponse);
                 response.setStatus(HttpStatus.SC_FORBIDDEN);
@@ -96,7 +102,9 @@ public class SecurityInterceptor implements PreProcessInterceptor {
     }
 
     /**
-     * <p>Retrieve the token from the request, if present.</p>
+     * <p>
+     * Retrieve the token from the request, if present.
+     * </p>
      * 
      * @param request
      * @return
@@ -104,27 +112,30 @@ public class SecurityInterceptor implements PreProcessInterceptor {
     private String getToken(HttpRequest request) {
         List<String> tokenHeader = request.getHttpHeaders().getRequestHeader(AUTH_TOKEN_HEADER_NAME);
         String token = null;
-        
+
         if (tokenHeader != null && !tokenHeader.isEmpty()) {
             token = tokenHeader.get(0);
         }
-        
+
         return token;
     }
 
     /**
-     * <p>Checks if the {@link ResourceMethod} requires authentication.</p>
+     * <p>
+     * Checks if the {@link ResourceMethod} requires authentication.
+     * </p>
      * 
      * @param method
      * @return
      */
     private boolean requiresAuthentication(ResourceMethod method) {
         Class<?> declaringClass = method.getMethod().getDeclaringClass();
-        
-        Class<?>[] arr = new Class[] { SignInEndpoint.class, LogoutEndpoint.class, AccountRegistrationEndpoint.class, UserInfoEndpoint.class};
-        
+
+        Class<?>[] arr = new Class[] { SignInEndpoint.class, LogoutEndpoint.class, AccountRegistrationEndpoint.class,
+                CheckUserNameEndpoint.class, UserInfoEndpoint.class };
+
         List<Class<?>> classes = Arrays.asList(arr);
-        
+
         return classes.contains(declaringClass) == false;
     }
 }

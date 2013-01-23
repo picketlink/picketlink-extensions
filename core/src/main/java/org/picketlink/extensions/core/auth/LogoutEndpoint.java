@@ -27,7 +27,7 @@ import javax.inject.Inject;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 
-import org.picketlink.extensions.core.pbox.PicketBoxIdentity;
+import org.picketlink.Identity;
 
 /**
  * <p>JAX-RS Endpoint to logout users.</p>
@@ -40,7 +40,7 @@ import org.picketlink.extensions.core.pbox.PicketBoxIdentity;
 public class LogoutEndpoint {
 
     @Inject
-    private PicketBoxIdentity identity;
+    private Identity identity;
     
     /**
      * <p>Performs the logout.</p>

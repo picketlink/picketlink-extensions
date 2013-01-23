@@ -21,8 +21,6 @@
  */
 package org.picketlink.extensions.core.auth;
 
-import java.util.List;
-
 import javax.ejb.Stateless;
 import javax.inject.Inject;
 import javax.ws.rs.Consumes;
@@ -38,7 +36,6 @@ import org.picketlink.idm.credential.internal.Password;
 import org.picketlink.idm.model.Attribute;
 import org.picketlink.idm.model.SimpleUser;
 import org.picketlink.idm.model.User;
-import org.picketlink.idm.query.IdentityQuery;
 
 /**
  * Endpoint for User Account Registration
@@ -71,13 +68,7 @@ public class AccountRegistrationEndpoint {
         String userName = request.getUserName();
 
         // EntityManagerPropagationContext.set(entityManager);
-        IdentityQuery<User> query = identityManager.createIdentityQuery(User.class);
-        query.setParameter(User.ID, userName);
-
-        List<User> users = query.getResultList();
-        int size = users.size();
-
-        if (size == 0) {
+        if (this.identityManager.getUser(userName) == null) {
             // UserName is not already registered
             User user = new SimpleUser(userName);
             user.setEmail(request.getEmail());
@@ -90,15 +81,15 @@ public class AccountRegistrationEndpoint {
             user.setAttribute(new Attribute<String>("postalCode", request.getPostalCode()));
             user.setAttribute(new Attribute<String>("country", request.getCountry()));
 
-            identityManager.add(user);
-
-            identityManager.updateCredential(user, new Password(request.getPassword()));
+            this.identityManager.add(user);
+            this.identityManager.updateCredential(user, new Password(request.getPassword()));
+            
             response.setStatus("Registered");
             response.setRegistered(true);
-
         } else {
             response.setStatus("UserName already taken. Choose another name!");
         }
+        
         // EntityManagerPropagationContext.clear();
         return response;
     }

@@ -28,6 +28,7 @@ import org.picketbox.core.authentication.impl.OTPAuthenticationMechanism;
 
 /**
  * Produces {@link OTPAuthenticationMechanism}
+ * 
  * @author anil saldhana
  * @since Oct 10, 2012
  */

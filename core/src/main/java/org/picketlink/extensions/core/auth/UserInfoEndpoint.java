@@ -30,7 +30,7 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
- 
+
 import org.picketbox.core.UserContext;
 import org.picketlink.extensions.core.pbox.PicketBoxIdentity;
 import org.picketlink.idm.model.Role;
@@ -53,7 +53,8 @@ public class UserInfoEndpoint {
     @Produces (MediaType.APPLICATION_JSON)
     public UserInfo getInfo() {
         UserInfo userInfo = new UserInfo();
-        if(identity.isLoggedIn()){            
+        
+        if (identity.isLoggedIn()) {            
             User user = this.identity.getUser();
             userInfo.setUserId(user.getLoginName());
             userInfo.setFullName(user.getFirstName() + " " + user.getLastName());
@@ -72,6 +73,7 @@ public class UserInfoEndpoint {
             
             userInfo.setRoles(rolesArray);
         }
+        
         return userInfo;
     }
     
