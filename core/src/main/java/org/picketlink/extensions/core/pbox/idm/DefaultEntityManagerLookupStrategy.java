@@ -40,7 +40,7 @@ import org.picketbox.core.identity.jpa.EntityManagerLookupStrategy;
  */
 @ApplicationScoped
 public class DefaultEntityManagerLookupStrategy extends EntityManagerLookupStrategy {
-
+    
     @Inject
     private Instance<EntityManager> entityManager;
 
@@ -51,7 +51,7 @@ public class DefaultEntityManagerLookupStrategy extends EntityManagerLookupStrat
         try {
             entityManager = this.entityManager.get();
         } catch (Exception e) {
-
+            throw new RuntimeException(e);
         }
 
         return entityManager;
