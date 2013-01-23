@@ -28,11 +28,11 @@ import javax.inject.Inject;
 
 import org.junit.After;
 import org.junit.Before;
-import org.picketbox.cdi.test.arquillian.AbstractArquillianTestCase;
 import org.picketbox.core.PicketBoxManager;
 import org.picketbox.core.authentication.credential.UsernamePasswordCredential;
 import org.picketlink.Identity;
 import org.picketlink.extensions.core.pbox.LoginCredential;
+import org.picketlink.test.core.arquillian.AbstractArquillianTestCase;
 
 /**
  * <p>Base class for test cases that needs to have an authenticated user during the tests.</p>

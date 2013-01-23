@@ -35,7 +35,6 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.picketbox.cdi.test.arquillian.ArchiveUtil;
 import org.picketbox.core.authentication.credential.UsernamePasswordCredential;
 import org.picketbox.core.identity.jpa.EntityManagerPropagationContext;
 import org.picketlink.extensions.core.pbox.LoginCredential;
@@ -47,6 +46,7 @@ import org.picketlink.idm.model.Role;
 import org.picketlink.idm.model.SimpleGroup;
 import org.picketlink.idm.model.SimpleRole;
 import org.picketlink.idm.model.SimpleUser;
+import org.picketlink.test.core.arquillian.ArchiveUtil;
 
 /**
  * <p>Test for the PicketLink IDM support.</p>
