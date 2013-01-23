@@ -102,7 +102,7 @@ public class PicketBoxIdentity extends DefaultIdentity {
             subject = this.picketBoxManager.authenticate(authenticationUserContext);
         } catch (Exception e) {
             this.beanManager.fireEvent(new LoginFailedEvent(e));
-            throw new AuthenticationException(e.getMessage());
+            throw new AuthenticationException(e.getMessage(),e);
         }
 
         if (subject != null && subject.isAuthenticated()) {
