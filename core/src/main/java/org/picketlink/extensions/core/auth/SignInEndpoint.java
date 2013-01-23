@@ -59,8 +59,8 @@ public class SignInEndpoint {
     private LoginCredential credential;
     
 
-    @PersistenceContext(type = PersistenceContextType.EXTENDED)
-    private EntityManager entityManager;
+//    @PersistenceContext(type = PersistenceContextType.EXTENDED)
+//    private EntityManager entityManager;
     
     /**
      * <p>Performs the authentication using the informations provided by the {@link AuthenticationRequest}</p>
@@ -78,10 +78,10 @@ public class SignInEndpoint {
         
         credential.setCredential(new UsernamePasswordCredential(authcRequest.getUserId(), authcRequest.getPassword()));
 
-        EntityManagerPropagationContext.set(entityManager);
+//        EntityManagerPropagationContext.set(entityManager);
         this.identity.login();
 
-        EntityManagerPropagationContext.clear();
+//        EntityManagerPropagationContext.clear();
         return createResponse(authcRequest);
     }
 

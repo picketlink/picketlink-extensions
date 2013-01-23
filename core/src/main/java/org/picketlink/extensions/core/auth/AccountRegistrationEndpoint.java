@@ -25,9 +25,6 @@ import java.util.List;
 
 import javax.ejb.Stateless;
 import javax.inject.Inject;
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
-import javax.persistence.PersistenceContextType;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -37,7 +34,6 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
 import org.picketbox.core.PicketBoxManager;
-import org.picketbox.core.identity.jpa.EntityManagerPropagationContext;
 import org.picketbox.jaxrs.model.AccountRegistrationRequest;
 import org.picketbox.jaxrs.model.AccountRegistrationResponse;
 import org.picketlink.idm.IdentityManager;
@@ -61,8 +57,8 @@ public class AccountRegistrationEndpoint {
     
     private IdentityManager identityManager;
 
-    @PersistenceContext(type = PersistenceContextType.EXTENDED)
-    private EntityManager entityManager;
+//    @PersistenceContext(type = PersistenceContextType.EXTENDED)
+//    private EntityManager entityManager;
 
     /**
      * Check if an UserName is already taken
@@ -75,7 +71,7 @@ public class AccountRegistrationEndpoint {
 
         AccountRegistrationResponse response = new AccountRegistrationResponse();
 
-        EntityManagerPropagationContext.set(entityManager);
+//        EntityManagerPropagationContext.set(entityManager);
         identityManager = picketboxManager.getIdentityManager();
         
         IdentityQuery<User> query = identityManager.createIdentityQuery(User.class);
@@ -86,7 +82,7 @@ public class AccountRegistrationEndpoint {
         if(size >0){
             response.setRegistered(true);
         }
-        EntityManagerPropagationContext.clear();
+//        EntityManagerPropagationContext.clear();
         return response;
     }
     
@@ -103,7 +99,7 @@ public class AccountRegistrationEndpoint {
         
         String userName = request.getUserName();
         
-        EntityManagerPropagationContext.set(entityManager);
+//        EntityManagerPropagationContext.set(entityManager);
         identityManager = picketboxManager.getIdentityManager();
         
         IdentityQuery<User> query = identityManager.createIdentityQuery(User.class);
@@ -134,7 +130,7 @@ public class AccountRegistrationEndpoint {
         } else {
             response.setStatus("UserName already taken. Choose another name!");
         }
-        EntityManagerPropagationContext.clear();
+//        EntityManagerPropagationContext.clear();
         return response;
     }
 }
