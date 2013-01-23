@@ -29,7 +29,6 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
 import org.picketbox.jaxrs.model.AccountRegistrationRequest;
@@ -56,28 +55,6 @@ public class AccountRegistrationEndpoint {
 
     // @PersistenceContext(type = PersistenceContextType.EXTENDED)
     // private EntityManager entityManager;
-
-    /**
-     * Check if an UserName is already taken
-     * 
-     * @param userName
-     * @return
-     */
-    @POST
-    @Produces(MediaType.APPLICATION_JSON)
-    public AccountRegistrationResponse alreadyExists(@QueryParam("userName") String userName) {
-
-        AccountRegistrationResponse response = new AccountRegistrationResponse();
-
-        // EntityManagerPropagationContext.set(entityManager);
-        // identityManager = picketboxManager.getIdentityManager();
-
-        if (identityManager.getUser(userName) != null) {
-            response.setRegistered(true);
-        }
-        // EntityManagerPropagationContext.clear();
-        return response;
-    }
 
     /**
      * Register an user account
