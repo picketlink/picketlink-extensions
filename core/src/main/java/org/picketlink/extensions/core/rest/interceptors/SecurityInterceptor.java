@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-package org.picketlink.extensions.core.interceptors;
+package org.picketlink.extensions.core.rest.interceptors;
 
 import java.util.Arrays;
 import java.util.List;
@@ -38,12 +38,12 @@ import org.jboss.resteasy.spi.HttpRequest;
 import org.jboss.resteasy.spi.interception.PreProcessInterceptor;
 import org.picketbox.jaxrs.model.AuthenticationResponse;
 import org.picketlink.authentication.AuthenticationException;
-import org.picketlink.extensions.core.auth.AccountRegistrationEndpoint;
-import org.picketlink.extensions.core.auth.CheckUserNameEndpoint;
-import org.picketlink.extensions.core.auth.LogoutEndpoint;
-import org.picketlink.extensions.core.auth.SignInEndpoint;
-import org.picketlink.extensions.core.auth.UserInfoEndpoint;
 import org.picketlink.extensions.core.pbox.PicketBoxIdentity;
+import org.picketlink.extensions.core.rest.AccountRegistrationEndpoint;
+import org.picketlink.extensions.core.rest.CheckUserNameEndpoint;
+import org.picketlink.extensions.core.rest.LogoutEndpoint;
+import org.picketlink.extensions.core.rest.SignInEndpoint;
+import org.picketlink.extensions.core.rest.UserInfoEndpoint;
 
 /**
  * <p>

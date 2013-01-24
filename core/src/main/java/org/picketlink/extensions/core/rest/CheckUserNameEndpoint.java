@@ -20,26 +20,47 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-package org.picketlink.test.core.authorization;
+package org.picketlink.extensions.core.rest;
 
-import javax.enterprise.context.ApplicationScoped;
+import javax.ejb.Stateless;
+import javax.inject.Inject;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response.ResponseBuilder;
 
-import org.apache.deltaspike.core.api.exception.control.annotation.ExceptionHandler;
-import org.apache.deltaspike.core.api.exception.control.annotation.Handles;
-import org.apache.deltaspike.core.api.exception.control.event.ExceptionEvent;
+import org.picketbox.jaxrs.model.AccountRegistrationResponse;
+import org.picketlink.idm.IdentityManager;
 
 /**
- * @author <a href="mailto:psilva@redhat.com">Pedro Silva</a>
+ * @author Pedro Silva
  *
  */
-@ApplicationScoped
-@ExceptionHandler
-public class AuthorizationExceptionHandler {
+@Stateless
+@Path("/alreadyExists")
+public class CheckUserNameEndpoint {
 
-    public void handleException(@Handles ExceptionEvent<Throwable> evt) {
-        System.out.println(evt.getException());
-    }    
+    @Inject
+    private IdentityManager identityManager;
+
+    /**
+     * Check if an UserName is already taken
+     * 
+     * @param userName
+     * @return
+     */
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    public AccountRegistrationResponse alreadyExists(@QueryParam("userName") String userName) {
+
+        AccountRegistrationResponse response = new AccountRegistrationResponse();
+
+        if (this.identityManager.getUser(userName) != null) {
+            response.setRegistered(true);
+        }
+        
+        return response;
+    }
     
 }

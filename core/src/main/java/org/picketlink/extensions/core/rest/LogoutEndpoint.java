@@ -19,24 +19,40 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.picketlink.extensions.core.auth;
 
-import javax.enterprise.context.ApplicationScoped;
-import javax.enterprise.inject.Produces;
+package org.picketlink.extensions.core.rest;
 
-import org.picketbox.core.authentication.impl.OTPAuthenticationMechanism;
+import javax.ejb.Stateless;
+import javax.inject.Inject;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+
+import org.picketlink.Identity;
 
 /**
- * Produces {@link OTPAuthenticationMechanism}
+ * <p>JAX-RS Endpoint to logout users.</p>
  * 
- * @author anil saldhana
- * @since Oct 10, 2012
+ * @author <a href="mailto:psilva@redhat.com">Pedro Silva</a>
+ *
  */
-public class OTPAuthenticationMechanismProducer {
+@Stateless
+@Path("/logout")
+public class LogoutEndpoint {
 
-    @Produces
-    @ApplicationScoped
-    public OTPAuthenticationMechanism produceMechanism(){
-        return new OTPAuthenticationMechanism();
+    @Inject
+    private Identity identity;
+    
+    /**
+     * <p>Performs the logout.</p>
+     * 
+     * @param authcRequest
+     * @return
+     */
+    @GET
+    public void logout() {
+        if (this.identity.isLoggedIn()) {
+            this.identity.logout();
+        }
     }
+   
 }

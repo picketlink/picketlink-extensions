@@ -27,6 +27,7 @@ import org.jboss.shrinkwrap.api.ArchivePaths;
 import org.jboss.shrinkwrap.api.Filter;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.asset.Asset;
+import org.jboss.shrinkwrap.api.asset.EmptyAsset;
 import org.jboss.shrinkwrap.api.asset.StringAsset;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
@@ -51,8 +52,8 @@ public class ArchiveUtil {
      */
     public static WebArchive createTestArchive() {
         WebArchive archive = ShrinkWrap
-                .create(WebArchive.class, "test.jar")
-                .addAsManifestResource(getBeansXml(), ArchivePaths.create("beans.xml"))
+                .create(WebArchive.class, "test.war")
+                .addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml")
                 .addClass(IdentityManagerInitializer.class)
                 .addPackages(true, new Filter<ArchivePath>() {
                     @Override

@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.picketlink.extensions.core.auth;
+package org.picketlink.extensions.core.rest;
 
 import java.io.Serializable;
 
