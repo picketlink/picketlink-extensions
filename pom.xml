@@ -4,7 +4,7 @@
 
     <groupId>org.picketlink.extensions</groupId>
     <artifactId>picketlink-extensions-parent</artifactId>
-    <version>3.0.0-2013Jan24</version>
+    <version>3.0.0-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>PicketLink Extensions Parent</name>
