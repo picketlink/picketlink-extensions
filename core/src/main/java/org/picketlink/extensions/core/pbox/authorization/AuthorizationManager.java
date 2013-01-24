@@ -58,7 +58,6 @@ public class AuthorizationManager {
             return false;
         }
 
-
         String[] restrictedRoles = getRestrictedRoles(ctx);
 
         for (String restrictedRole : restrictedRoles) {

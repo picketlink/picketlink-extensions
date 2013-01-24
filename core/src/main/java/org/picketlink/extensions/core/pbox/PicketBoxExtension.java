@@ -27,7 +27,6 @@ import javax.enterprise.inject.spi.AfterBeanDiscovery;
 import javax.enterprise.inject.spi.BeanManager;
 import javax.enterprise.inject.spi.Extension;
 import javax.enterprise.inject.spi.ProcessAnnotatedType;
-import javax.enterprise.inject.spi.ProcessInjectionTarget;
 
 import org.picketlink.Identity;
 import org.picketlink.producer.IdentityManagerProducer;
@@ -74,12 +73,4 @@ public class PicketBoxExtension implements Extension {
         event.veto();
     }
 
-    /**
-     * <p>Vetos all {@link Identity} beans. Except the {@link PicketBoxIdentity}.<p>
-     *
-     * @param event
-     * @param beanManager
-     */
-    public <X> void configureJPAIdentityStore(@Observes ProcessInjectionTarget<X> event) {
-    }
 }
