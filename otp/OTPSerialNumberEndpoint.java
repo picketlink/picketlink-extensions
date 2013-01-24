@@ -33,8 +33,8 @@ import javax.ws.rs.core.MediaType;
 
 import org.picketbox.core.UserContext;
 import org.picketbox.core.util.Base32;
-import org.picketlink.extensions.core.auth.UserInfo;
 import org.picketlink.extensions.core.pbox.PicketBoxIdentity;
+import org.picketlink.extensions.core.rest.UserInfo;
 import org.picketlink.idm.IdentityManager;
 import org.picketlink.idm.model.Attribute;
 import org.picketlink.idm.model.Role;
