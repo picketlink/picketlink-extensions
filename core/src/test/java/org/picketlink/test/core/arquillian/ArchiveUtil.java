@@ -23,12 +23,9 @@
 package org.picketlink.test.core.arquillian;
 
 import org.jboss.shrinkwrap.api.ArchivePath;
-import org.jboss.shrinkwrap.api.ArchivePaths;
 import org.jboss.shrinkwrap.api.Filter;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
-import org.jboss.shrinkwrap.api.asset.Asset;
 import org.jboss.shrinkwrap.api.asset.EmptyAsset;
-import org.jboss.shrinkwrap.api.asset.StringAsset;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.jboss.shrinkwrap.resolver.api.DependencyResolvers;
@@ -90,12 +87,6 @@ public class ArchiveUtil {
                                         .resolveAsFiles()[0]));
 
         return archive;
-    }
-
-    private static Asset getBeansXml() {
-        Asset beansXml = new StringAsset("<beans></beans>");
-
-        return beansXml;
     }
 
 }
