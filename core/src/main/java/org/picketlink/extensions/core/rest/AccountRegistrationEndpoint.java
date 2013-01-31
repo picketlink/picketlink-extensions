@@ -50,9 +50,6 @@ public class AccountRegistrationEndpoint {
     @Inject
     private IdentityManager identityManager;
 
-    // @PersistenceContext(type = PersistenceContextType.EXTENDED)
-    // private EntityManager entityManager;
-
     /**
      * Register an user account
      * 
@@ -67,7 +64,6 @@ public class AccountRegistrationEndpoint {
 
         String userName = request.getUserName();
 
-        // EntityManagerPropagationContext.set(entityManager);
         if (this.identityManager.getUser(userName) == null) {
             // UserName is not already registered
             User user = new SimpleUser(userName);
@@ -90,7 +86,6 @@ public class AccountRegistrationEndpoint {
             response.setStatus("UserName already taken. Choose another name!");
         }
         
-        // EntityManagerPropagationContext.clear();
         return response;
     }
 }
