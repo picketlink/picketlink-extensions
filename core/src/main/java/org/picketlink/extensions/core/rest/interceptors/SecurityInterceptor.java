@@ -33,7 +33,7 @@ import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.HttpHeaders;
 
 import org.apache.http.HttpStatus;
-import org.apache.log4j.Logger;
+import org.jboss.logging.Logger;
 import org.jboss.resteasy.annotations.interception.ServerInterceptor;
 import org.jboss.resteasy.core.ResourceMethod;
 import org.jboss.resteasy.core.ServerResponse;
