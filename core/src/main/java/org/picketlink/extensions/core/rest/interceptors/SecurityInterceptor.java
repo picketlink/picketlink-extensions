@@ -24,12 +24,16 @@ package org.picketlink.extensions.core.rest.interceptors;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Cookie;
+import javax.ws.rs.core.HttpHeaders;
 
 import org.apache.http.HttpStatus;
+import org.apache.log4j.Logger;
 import org.jboss.resteasy.annotations.interception.ServerInterceptor;
 import org.jboss.resteasy.core.ResourceMethod;
 import org.jboss.resteasy.core.ServerResponse;
@@ -61,6 +65,8 @@ import org.picketlink.extensions.core.rest.UserInfoEndpoint;
 @ServerInterceptor
 public class SecurityInterceptor implements PreProcessInterceptor {
 
+    private Logger log = Logger.getLogger(SecurityInterceptor.class);
+    
     private static final String AUTH_TOKEN_HEADER_NAME = "Auth-Token";
     @Inject
     private PicketBoxIdentity identity;
@@ -83,7 +89,7 @@ public class SecurityInterceptor implements PreProcessInterceptor {
                 try {
                     isLoggedIn = identity.restoreSession(token);
                 } catch (AuthenticationException e) {
-
+                    log.error("Authentiation Failed:", e);
                 }
             }
 
@@ -110,11 +116,21 @@ public class SecurityInterceptor implements PreProcessInterceptor {
      * @return
      */
     private String getToken(HttpRequest request) {
-        List<String> tokenHeader = request.getHttpHeaders().getRequestHeader(AUTH_TOKEN_HEADER_NAME);
+        HttpHeaders httpHeaders = request.getHttpHeaders();
+        List<String> tokenHeader = httpHeaders.getRequestHeader(AUTH_TOKEN_HEADER_NAME);
         String token = null;
 
         if (tokenHeader != null && !tokenHeader.isEmpty()) {
             token = tokenHeader.get(0);
+        }
+        
+        //Check cookies
+        if(token == null){
+            Map<String,Cookie> cookies = httpHeaders.getCookies();
+            if(cookies != null){
+                Cookie cookie = cookies.get(AUTH_TOKEN_HEADER_NAME);
+                token = cookie.getValue();
+            }
         }
 
         return token;
