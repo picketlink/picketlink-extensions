@@ -73,5 +73,10 @@ public class AuthenticationTestCase extends AbstractAuthenticationTestCase {
         Assert.assertNotNull(user);
         Assert.assertEquals(USER_NAME, user.getLoginName());
     }
+    
+    @Test (expected=SecurityException.class)
+    public void testAlreadyLoggedInException() throws Exception {
+        this.identity.login();
+    }
 
 }
