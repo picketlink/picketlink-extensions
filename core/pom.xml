@@ -28,8 +28,8 @@
 
 	<properties>
 		<picketbox.core.version>5.0.0-2013Jan24</picketbox.core.version>
-		<picketlink.core.version>3.0.0-2013Jan24</picketlink.core.version>
-		<picketlink.idm.version>3.0.0-2013Jan24</picketlink.idm.version>
+		<picketlink.core.version>3.0.0-SNAPSHOT</picketlink.core.version>
+		<picketlink.idm.version>3.0.0-SNAPSHOT</picketlink.idm.version>
 		<deltaspike.version>0.3-incubating</deltaspike.version>
 		<arquillian.version>1.0.1.Final</arquillian.version>
 		<weld.version>1.1.5.Final</weld.version>
