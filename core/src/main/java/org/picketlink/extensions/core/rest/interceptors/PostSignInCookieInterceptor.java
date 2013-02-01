@@ -77,10 +77,10 @@ public class PostSignInCookieInterceptor implements PostProcessInterceptor {
                     int age = sessionCookieConfig.getMaxAge();
                     boolean secureCookie = sessionCookieConfig.isSecure();
                     
-                    //TODO: HTTPOnly
-                    
                     NewCookie cookie = new NewCookie(AUTH_TOKEN_HEADER_NAME, token,contextPath,path,domain,age,secureCookie);
-                    cookies.add(cookie);
+                    
+                    cookies.add(cookie.toString() + ";HttpOnly"); //Hacky way to introduce HttpOnly
+                    
                     headers.put(HttpHeaderNames.SET_COOKIE, cookies);
                 }
             }
