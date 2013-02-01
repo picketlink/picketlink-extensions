@@ -39,11 +39,7 @@ public class PicketBoxConfigurer {
 
     @Produces
     public ConfigurationBuilder createConfiguration() {
-        ConfigurationBuilder builder = new ConfigurationBuilder();
-
-        builder.identityManager().fileStore().preserveState();
-
-        return builder;
+        return new ConfigurationBuilder();
     }
 
 }
