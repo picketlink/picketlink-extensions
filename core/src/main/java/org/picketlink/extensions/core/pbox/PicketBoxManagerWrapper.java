@@ -27,6 +27,7 @@ import org.picketbox.core.PicketBoxManager;
 import org.picketbox.core.UserContext;
 import org.picketbox.core.audit.AuditProvider;
 import org.picketbox.core.authorization.Resource;
+import org.picketbox.core.authorization.ent.EntitlementsManager;
 import org.picketbox.core.config.PicketBoxConfiguration;
 import org.picketbox.core.event.PicketBoxEventManager;
 import org.picketbox.core.exceptions.AuthenticationException;
@@ -136,5 +137,10 @@ public class PicketBoxManagerWrapper implements PicketBoxManager {
     @Override
     public AuditProvider getAuditProvider() {
         return this.delegate.getAuditProvider();
+    }
+
+    @Override
+    public EntitlementsManager getEntitlementsManager() {
+        return this.delegate.getEntitlementsManager();
     }
 }

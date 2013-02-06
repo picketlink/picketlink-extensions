@@ -27,7 +27,7 @@
 	</organization>
 
 	<properties>
-		<picketbox.core.version>5.0.0-2013Feb01</picketbox.core.version>
+		<picketbox.core.version>5.0.0-SNAPSHOT</picketbox.core.version>
 		<picketlink.core.version>3.0.0-SNAPSHOT</picketlink.core.version>
 		<picketlink.idm.version>3.0.0-SNAPSHOT</picketlink.idm.version>
 		<deltaspike.version>0.3-incubating</deltaspike.version>

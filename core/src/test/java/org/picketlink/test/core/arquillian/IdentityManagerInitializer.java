@@ -25,7 +25,7 @@ package org.picketlink.test.core.arquillian;
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.event.Observes;
 
-import org.picketbox.core.InitializedEvent;
+import org.picketbox.core.event.InitializedEvent;
 import org.picketlink.idm.IdentityManager;
 import org.picketlink.idm.credential.internal.Password;
 import org.picketlink.idm.model.Group;

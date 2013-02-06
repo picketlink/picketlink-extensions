@@ -25,7 +25,7 @@ package org.picketlink.extensions.core.pbox;
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Named;
 
-import org.picketbox.core.UserCredential;
+import org.picketbox.core.authentication.credential.UserCredential;
 
 /**
  * @author <a href="mailto:psilva@redhat.com">Pedro Silva</a>
