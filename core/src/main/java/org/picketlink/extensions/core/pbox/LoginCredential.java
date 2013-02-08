@@ -44,5 +44,4 @@ public class LoginCredential {
     public void setCredential(UserCredential credential) {
         this.credential = credential;
     }
-
 }
