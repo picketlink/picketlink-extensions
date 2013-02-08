@@ -12,7 +12,6 @@
 	<name>PicketLink Extensions Core</name>
 	<url>http://jboss.org/picketlink/</url>
 	<description>Leverages the CDI and JAX-RS environment</description>
-
 	<licenses>
 		<license>
 			<name>Apache License, Version 2.0</name>
