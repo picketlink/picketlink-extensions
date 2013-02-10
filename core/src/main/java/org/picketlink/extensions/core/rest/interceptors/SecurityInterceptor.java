@@ -42,6 +42,7 @@ import org.jboss.resteasy.spi.HttpRequest;
 import org.jboss.resteasy.spi.interception.PreProcessInterceptor;
 import org.picketbox.jaxrs.model.AuthenticationResponse;
 import org.picketlink.authentication.AuthenticationException;
+import org.picketlink.extensions.core.pbox.DefaultPicketBoxIdentity;
 import org.picketlink.extensions.core.pbox.PicketBoxIdentity;
 import org.picketlink.extensions.core.rest.AccountRegistrationEndpoint;
 import org.picketlink.extensions.core.rest.CheckUserNameEndpoint;
@@ -55,7 +56,7 @@ import org.picketlink.extensions.core.rest.UserInfoEndpoint;
  * destination endpoint.
  * </p>
  * <p>
- * If the token is valid, the {@link PicketBoxIdentity} will restored with the all user information.
+ * If the token is valid, the {@link DefaultPicketBoxIdentity} will restored with the all user information.
  * </p>
  * 
  * @author <a href="mailto:psilva@redhat.com">Pedro Silva</a>
@@ -68,6 +69,7 @@ public class SecurityInterceptor implements PreProcessInterceptor {
     private Logger log = Logger.getLogger(SecurityInterceptor.class);
     
     private static final String AUTH_TOKEN_HEADER_NAME = "Auth-Token";
+    
     @Inject
     private PicketBoxIdentity identity;
 

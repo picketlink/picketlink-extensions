@@ -39,33 +39,46 @@ import javax.enterprise.inject.spi.InjectionPoint;
 import javax.enterprise.inject.spi.InjectionTarget;
 import javax.enterprise.util.AnnotationLiteral;
 
+import org.picketbox.core.DefaultPicketBoxManager;
 import org.picketbox.core.PicketBoxManager;
 import org.picketbox.core.config.ConfigurationBuilder;
+import org.picketbox.http.PicketBoxHTTPManager;
+import org.picketbox.http.config.HTTPConfigurationBuilder;
+import org.picketbox.http.config.PicketBoxHTTPConfiguration;
 import org.picketlink.extensions.core.pbox.event.CDIAuthenticationEventManager;
 
 /**
  * <p>
  * {@link Bean} implementation to define/customize the behaviour for {@link PicketBoxManager} instances.
  * </p>
- *
+ * 
  * @author <a href="mailto:psilva@redhat.com">Pedro Silva</a>
- *
+ * 
  */
 public class PicketBoxManagerBeanDefinition implements Bean<PicketBoxManager> {
 
     private BeanManager beanManager;
     private InjectionTarget<PicketBoxManager> injectionTarget;
+    private Type configurationType;
 
     @SuppressWarnings("unchecked")
-    public PicketBoxManagerBeanDefinition(BeanManager beanManager) {
+    public PicketBoxManagerBeanDefinition(BeanManager beanManager, Type configurationType) {
         this.beanManager = beanManager;
-        AnnotatedType<? extends PicketBoxManager> at = beanManager.createAnnotatedType(PicketBoxManagerWrapper.class);
+        this.configurationType = configurationType;
+        AnnotatedType<? extends PicketBoxManager> at = null;
+
+        if (isHTTPConfiguration()) {
+            at = beanManager.createAnnotatedType(PicketBoxHTTPManager.class);
+        } else {
+            at = beanManager.createAnnotatedType(DefaultPicketBoxManager.class);
+        }
+
         this.injectionTarget = (InjectionTarget<PicketBoxManager>) beanManager.createInjectionTarget(at);
     }
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see javax.enterprise.context.spi.Contextual#create(javax.enterprise.context.spi.CreationalContext)
      */
     @Override
@@ -75,12 +88,14 @@ public class PicketBoxManagerBeanDefinition implements Bean<PicketBoxManager> {
         ConfigurationBuilder configurationBuilder = resolveConfigurationBuilder();
 
         configurationBuilder.eventManager().manager(new CDIAuthenticationEventManager(this.beanManager));
-
-        picketBoxManager = new PicketBoxManagerWrapper(configurationBuilder.build());
+        
+        if (isHTTPConfiguration()) {
+            picketBoxManager = new PicketBoxHTTPManager((PicketBoxHTTPConfiguration) configurationBuilder.build());
+        } else {
+            picketBoxManager = new DefaultPicketBoxManager(configurationBuilder.build());
+        }
 
         picketBoxManager.start();
-
-        creationalContext.push(picketBoxManager);
 
         return picketBoxManager;
     }
@@ -89,7 +104,7 @@ public class PicketBoxManagerBeanDefinition implements Bean<PicketBoxManager> {
      * <p>
      * Resolves the {@link ConfigurationBuilder} instance to be used during the {@link PicketBoxManager} creation.
      * </p>
-     *
+     * 
      * @return
      */
     @SuppressWarnings({ "unchecked", "serial" })
@@ -108,10 +123,10 @@ public class PicketBoxManagerBeanDefinition implements Bean<PicketBoxManager> {
 
         return bean.create(createCreationalContext);
     }
-
+    
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see javax.enterprise.context.spi.Contextual#destroy(java.lang.Object, javax.enterprise.context.spi.CreationalContext)
      */
     @Override
@@ -123,12 +138,16 @@ public class PicketBoxManagerBeanDefinition implements Bean<PicketBoxManager> {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see javax.enterprise.inject.spi.Bean#getTypes()
      */
     @Override
     public Set<Type> getTypes() {
         Set<Type> types = new HashSet<Type>();
+
+        if (isHTTPConfiguration()) {
+            types.add(PicketBoxHTTPManager.class);
+        }
 
         types.add(PicketBoxManager.class);
         types.add(Object.class);
@@ -136,9 +155,13 @@ public class PicketBoxManagerBeanDefinition implements Bean<PicketBoxManager> {
         return types;
     }
 
+    private boolean isHTTPConfiguration() {
+        return HTTPConfigurationBuilder.class.equals(this.configurationType);
+    }
+
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see javax.enterprise.inject.spi.Bean#getQualifiers()
      */
     @SuppressWarnings("serial")
@@ -156,7 +179,7 @@ public class PicketBoxManagerBeanDefinition implements Bean<PicketBoxManager> {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see javax.enterprise.inject.spi.Bean#getScope()
      */
     @Override
@@ -166,7 +189,7 @@ public class PicketBoxManagerBeanDefinition implements Bean<PicketBoxManager> {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see javax.enterprise.inject.spi.Bean#getName()
      */
     @Override
@@ -176,7 +199,7 @@ public class PicketBoxManagerBeanDefinition implements Bean<PicketBoxManager> {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see javax.enterprise.inject.spi.Bean#getStereotypes()
      */
     @Override
@@ -186,7 +209,7 @@ public class PicketBoxManagerBeanDefinition implements Bean<PicketBoxManager> {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see javax.enterprise.inject.spi.Bean#getBeanClass()
      */
     @Override
@@ -196,7 +219,7 @@ public class PicketBoxManagerBeanDefinition implements Bean<PicketBoxManager> {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see javax.enterprise.inject.spi.Bean#isAlternative()
      */
     @Override
@@ -206,7 +229,7 @@ public class PicketBoxManagerBeanDefinition implements Bean<PicketBoxManager> {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see javax.enterprise.inject.spi.Bean#isNullable()
      */
     @Override
@@ -216,7 +239,7 @@ public class PicketBoxManagerBeanDefinition implements Bean<PicketBoxManager> {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see javax.enterprise.inject.spi.Bean#getInjectionPoints()
      */
     @Override
