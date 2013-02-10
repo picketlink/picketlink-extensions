@@ -26,7 +26,7 @@
 	</organization>
 
 	<properties>
-		<picketbox.core.version>5.0.0.Final</picketbox.core.version>
+		<picketbox.core.version>5.0.1-SNAPSHOT</picketbox.core.version>
 		<picketlink.core.version>3.0.0-SNAPSHOT</picketlink.core.version>
 		<picketlink.idm.version>3.0.0-SNAPSHOT</picketlink.idm.version>
 		<deltaspike.version>0.3-incubating</deltaspike.version>
@@ -60,6 +60,11 @@
 		<dependency>
 			<groupId>org.picketbox</groupId>
 			<artifactId>picketbox-core</artifactId>
+			<version>${picketbox.core.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.picketbox</groupId>
+			<artifactId>picketbox-http</artifactId>
 			<version>${picketbox.core.version}</version>
 		</dependency>
 		<dependency>
