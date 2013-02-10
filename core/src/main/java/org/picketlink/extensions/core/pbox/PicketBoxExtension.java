@@ -22,54 +22,73 @@
 
 package org.picketlink.extensions.core.pbox;
 
+import java.lang.reflect.Type;
+
 import javax.enterprise.event.Observes;
 import javax.enterprise.inject.spi.AfterBeanDiscovery;
+import javax.enterprise.inject.spi.AnnotatedType;
 import javax.enterprise.inject.spi.BeanManager;
 import javax.enterprise.inject.spi.Extension;
 import javax.enterprise.inject.spi.ProcessAnnotatedType;
+import javax.enterprise.inject.spi.ProcessProducer;
 
+import org.picketbox.core.config.ConfigurationBuilder;
 import org.picketlink.Identity;
 import org.picketlink.producer.IdentityManagerProducer;
 
 /**
- * <p>PicketBox CDI Extension for configuring the PicketBox security environment.</p>
- *
+ * <p>
+ * PicketBox CDI Extension for configuring the PicketBox security environment.
+ * </p>
+ * 
  * @author <a href="mailto:psilva@redhat.com">Pedro Silva</a>
- *
+ * 
  */
 public class PicketBoxExtension implements Extension {
 
+    private Type configurationType;
+
     /**
-     * <p>Adds the {@link PicketBoxManagerBeanDefinition}.</p>
-     *
+     * <p>
+     * Adds the {@link PicketBoxManagerBeanDefinition}.
+     * </p>
+     * 
      * @param event
      * @param beanManager
      */
     public void addPicketBoxManagerBeanDefinition(@Observes AfterBeanDiscovery event, BeanManager beanManager) {
-        event.addBean(new PicketBoxManagerBeanDefinition(beanManager));
+        event.addBean(new PicketBoxManagerBeanDefinition(beanManager, this.configurationType));
+        event.addBean(new PicketBoxIdentityBeanDefinition(beanManager, this.configurationType));
+    }
+
+    public void installPicketBoxManager(@Observes ProcessProducer<?, ConfigurationBuilder> event, BeanManager beanManager) {
+        this.configurationType = event.getAnnotatedMember().getBaseType();
     }
 
     /**
-     * <p>Vetos all {@link Identity} beans. Except the {@link PicketBoxIdentity}.<p>
-     *
+     * <p>
+     * Vetos all {@link Identity} beans. Except the {@link DefaultPicketBoxIdentity}.
+     * <p>
+     * 
      * @param event
      * @param beanManager
      */
     public void installPicketBoxIdentity(@Observes ProcessAnnotatedType<Identity> event, BeanManager beanManager) {
-        if (!event.getAnnotatedType().getJavaClass().equals(PicketBoxIdentity.class)) {
-            event.veto();
-        }
+        event.veto();
     }
 
     /**
-     * <p>Veto PicketLink {@link IdentityManagerProducer} bean.<p>
-     *
+     * <p>
+     * Veto PicketLink {@link IdentityManagerProducer} bean.
+     * <p>
+     * 
      * TODO: Check if PicketLink will maintain this file. Othwerwise this method can me removed.
-     *
+     * 
      * @param event
      * @param beanManager
      */
-    public void installPicketBoxIdentityManagerProducer(@Observes ProcessAnnotatedType<IdentityManagerProducer> event, BeanManager beanManager) {
+    public void installPicketBoxIdentityManagerProducer(@Observes ProcessAnnotatedType<IdentityManagerProducer> event,
+            BeanManager beanManager) {
         event.veto();
     }
 
