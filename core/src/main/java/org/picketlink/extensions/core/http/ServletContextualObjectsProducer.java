@@ -6,7 +6,7 @@ import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-public class ServletContextObjectsProducer {
+public class ServletContextualObjectsProducer {
 
     @Inject
     private ServletContextualObjectsHolder holder;
