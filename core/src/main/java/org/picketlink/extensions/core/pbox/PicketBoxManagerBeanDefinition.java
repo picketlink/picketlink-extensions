@@ -39,9 +39,9 @@ import javax.enterprise.inject.spi.InjectionPoint;
 import javax.enterprise.inject.spi.InjectionTarget;
 import javax.enterprise.util.AnnotationLiteral;
 
-import org.picketbox.core.DefaultPicketBoxManager;
 import org.picketbox.core.PicketBoxManager;
 import org.picketbox.core.config.ConfigurationBuilder;
+import org.picketbox.core.config.PicketBoxConfiguration;
 import org.picketbox.http.PicketBoxHTTPManager;
 import org.picketbox.http.config.HTTPConfigurationBuilder;
 import org.picketbox.http.config.PicketBoxHTTPConfiguration;
@@ -68,9 +68,9 @@ public class PicketBoxManagerBeanDefinition implements Bean<PicketBoxManager> {
         AnnotatedType<? extends PicketBoxManager> at = null;
 
         if (isHTTPConfiguration()) {
-            at = beanManager.createAnnotatedType(PicketBoxHTTPManager.class);
+            at = beanManager.createAnnotatedType(CDIPicketBoxHTTPManager.class);
         } else {
-            at = beanManager.createAnnotatedType(DefaultPicketBoxManager.class);
+            at = beanManager.createAnnotatedType(CDIDefaultPicketBoxManager.class);
         }
 
         this.injectionTarget = (InjectionTarget<PicketBoxManager>) beanManager.createInjectionTarget(at);
@@ -89,10 +89,12 @@ public class PicketBoxManagerBeanDefinition implements Bean<PicketBoxManager> {
 
         configurationBuilder.eventManager().manager(new CDIAuthenticationEventManager(this.beanManager));
         
+        PicketBoxConfiguration configuration = configurationBuilder.build();
+        
         if (isHTTPConfiguration()) {
-            picketBoxManager = new PicketBoxHTTPManager((PicketBoxHTTPConfiguration) configurationBuilder.build());
+            picketBoxManager = new CDIPicketBoxHTTPManager((PicketBoxHTTPConfiguration) configuration);
         } else {
-            picketBoxManager = new DefaultPicketBoxManager(configurationBuilder.build());
+            picketBoxManager = new CDIDefaultPicketBoxManager(configuration);
         }
 
         picketBoxManager.start();

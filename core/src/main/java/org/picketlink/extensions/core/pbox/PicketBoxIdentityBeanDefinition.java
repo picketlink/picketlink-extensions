@@ -64,9 +64,9 @@ public class PicketBoxIdentityBeanDefinition implements Bean<Identity> {
         AnnotatedType<? extends Identity> at = null;
         
         if (isHTTPConfiguration()) {
-            at = beanManager.createAnnotatedType(PicketBoxHTTPIdentity.class);    
+            at = this.beanManager.createAnnotatedType(PicketBoxHTTPIdentity.class);    
         } else {
-            at = beanManager.createAnnotatedType(DefaultPicketBoxIdentity.class);
+            at = this.beanManager.createAnnotatedType(DefaultPicketBoxIdentity.class);
         }
         
         this.injectionTarget = (InjectionTarget<Identity>) beanManager.createInjectionTarget(at);
@@ -106,10 +106,6 @@ public class PicketBoxIdentityBeanDefinition implements Bean<Identity> {
     @Override
     public Set<Type> getTypes() {
         Set<Type> types = new HashSet<Type>();
-        
-//        if (isHTTPConfiguration()) {
-//            types.add(PicketBoxHTTPIdentity.class);
-//        }
         
         types.add(PicketBoxIdentity.class);
         types.add(Identity.class);

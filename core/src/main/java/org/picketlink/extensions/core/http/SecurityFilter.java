@@ -33,7 +33,6 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.picketbox.core.PicketBoxManager;
 import org.picketbox.http.PicketBoxHTTPManager;
 import org.picketbox.http.filters.DelegatingSecurityFilter;
 import org.picketlink.Identity;
@@ -45,7 +44,7 @@ import org.picketlink.Identity;
 public class SecurityFilter extends DelegatingSecurityFilter {
 
     @Inject
-    private PicketBoxManager securityManager;
+    private PicketBoxHTTPManager securityManager;
     
     @Inject
     private ServletContextualObjectsHolder holder;
@@ -55,7 +54,7 @@ public class SecurityFilter extends DelegatingSecurityFilter {
     
     @Override
     protected PicketBoxHTTPManager doInitSecurityManager(FilterConfig fc) {
-        return (PicketBoxHTTPManager) this.securityManager;
+        return this.securityManager;
     }
     
     @Override
