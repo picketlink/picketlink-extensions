@@ -46,7 +46,8 @@ public class ArchiveUtil {
     public static WebArchive createTestArchive() {
         WebArchive archive = ShrinkWrap
                 .create(WebArchive.class, "test.war")
-                .addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml")
+                .addAsWebInfResource("beans.xml")
+                //.addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml")
                 .addClass(IdentityManagerInitializer.class)
                 .addPackages(true, new Filter<ArchivePath>() {
                     @Override

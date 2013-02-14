@@ -24,7 +24,7 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.interceptor.InvocationContext;
 
 import org.picketlink.Identity;
-import org.picketlink.deltaspike.Secures;
+import org.picketlink.deltaspike.security.Secures;
 import org.picketlink.extensions.core.pbox.PicketBoxIdentity;
 
 /**
