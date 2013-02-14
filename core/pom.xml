@@ -110,7 +110,7 @@
 			<version>1.9.2</version>
 			<scope>provided</scope>
 		</dependency>
-		<!-- Apache DeltaSpike -->
+		<!-- Apache DeltaSpike 
 		<dependency>
 			<groupId>org.apache.deltaspike.core</groupId>
 			<artifactId>deltaspike-core-api</artifactId>
@@ -127,6 +127,8 @@
 			<groupId>org.apache.deltaspike.modules</groupId>
 			<artifactId>deltaspike-security-module-impl</artifactId>
 		</dependency>
+                -->
+
 		<!-- JBoss Logging -->
 		<dependency>
 			<groupId>org.jboss.logging</groupId>

@@ -23,8 +23,8 @@ import static org.picketlink.extensions.core.pbox.util.AnnotationUtil.getDeclare
 import javax.enterprise.context.ApplicationScoped;
 import javax.interceptor.InvocationContext;
 
-import org.apache.deltaspike.security.api.authorization.annotation.Secures;
 import org.picketlink.Identity;
+import org.picketlink.deltaspike.Secures;
 import org.picketlink.extensions.core.pbox.PicketBoxIdentity;
 
 /**
