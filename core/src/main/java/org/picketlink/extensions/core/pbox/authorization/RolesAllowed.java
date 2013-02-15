@@ -28,7 +28,8 @@ import java.lang.annotation.Target;
 
 import javax.enterprise.util.Nonbinding;
 
-import org.picketlink.deltaspike.security.SecurityBindingType;
+import org.apache.deltaspike.security.api.authorization.annotation.SecurityBindingType;
+
  
 
 /**

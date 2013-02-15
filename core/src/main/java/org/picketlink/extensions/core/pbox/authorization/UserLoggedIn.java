@@ -28,7 +28,7 @@ import java.lang.annotation.Target;
 
 import javax.inject.Qualifier;
 
-import org.picketlink.deltaspike.security.SecurityBindingType;
+import org.apache.deltaspike.security.api.authorization.annotation.SecurityBindingType;
  
 
 /**

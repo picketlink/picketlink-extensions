@@ -46,14 +46,20 @@ public class ArchiveUtil {
     public static WebArchive createTestArchive() {
         WebArchive archive = ShrinkWrap
                 .create(WebArchive.class, "test.war")
-                .addAsWebInfResource("beans.xml")
-                //.addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml")
+                .addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml")
                 .addClass(IdentityManagerInitializer.class)
                 .addPackages(true, new Filter<ArchivePath>() {
                     @Override
                     public boolean include(ArchivePath object) {
                         return object.get().indexOf("/test/") == -1;
-                    }}, PicketBoxExtension.class.getPackage())
+                    }}, PicketBoxExtension.class.getPackage()) 
+                .addAsLibraries(
+                            ShrinkWrap.createFromZipFile(
+                                    JavaArchive.class,
+                                    DependencyResolvers.use(MavenDependencyResolver.class)
+                                            .loadMetadataFromPom("pom.xml")
+                                            .artifact("org.apache.deltaspike.modules:deltaspike-security-module-impl")
+                                            .resolveAsFiles()[0]))
                 .addAsLibraries(
                         ShrinkWrap.createFromZipFile(
                                 JavaArchive.class,
