@@ -24,6 +24,7 @@ package org.picketlink.extensions.core.http;
 
 import java.io.IOException;
 
+import javax.enterprise.inject.Instance;
 import javax.inject.Inject;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
@@ -44,7 +45,7 @@ import org.picketlink.Identity;
 public class SecurityFilter extends DelegatingSecurityFilter {
 
     @Inject
-    private PicketBoxHTTPManager securityManager;
+    private Instance<PicketBoxHTTPManager> securityManager;
     
     @Inject
     private ServletContextualObjectsHolder holder;
@@ -54,7 +55,7 @@ public class SecurityFilter extends DelegatingSecurityFilter {
     
     @Override
     protected PicketBoxHTTPManager doInitSecurityManager(FilterConfig fc) {
-        return this.securityManager;
+        return this.securityManager.get();
     }
     
     @Override
