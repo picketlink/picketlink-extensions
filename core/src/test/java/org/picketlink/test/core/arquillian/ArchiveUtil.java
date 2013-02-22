@@ -53,13 +53,13 @@ public class ArchiveUtil {
                     public boolean include(ArchivePath object) {
                         return object.get().indexOf("/test/") == -1;
                     }}, PicketBoxExtension.class.getPackage()) 
-                .addAsLibraries(
+                /*.addAsLibraries(
                             ShrinkWrap.createFromZipFile(
                                     JavaArchive.class,
                                     DependencyResolvers.use(MavenDependencyResolver.class)
                                             .loadMetadataFromPom("pom.xml")
                                             .artifact("org.apache.deltaspike.modules:deltaspike-security-module-impl")
-                                            .resolveAsFiles()[0]))
+                                            .resolveAsFiles()[0]))*/
                 .addAsLibraries(
                         ShrinkWrap.createFromZipFile(
                                 JavaArchive.class,

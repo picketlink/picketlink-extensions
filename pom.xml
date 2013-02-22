@@ -73,6 +73,12 @@
 			</dependency>
 
 			<dependency>
+				<groupId>org.picketlink</groupId>
+				<artifactId>picketlink-social</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+
+			<dependency>
 				<groupId>org.jboss.spec</groupId>
 				<artifactId>jboss-javaee-6.0</artifactId>
 				<version>${jboss.javaee.version}</version>
@@ -87,6 +93,8 @@
 				<scope>provided</scope>
 				<type>pom</type>
 			</dependency>
+
+                   <!--
 
 			<dependency>
 				<groupId>org.apache.deltaspike.core</groupId>
@@ -115,7 +123,7 @@
 				<version>${deltaspike.version}</version>
 				<scope>runtime</scope>
 			</dependency>
-
+                    -->
 		</dependencies>
 	</dependencyManagement>
 
