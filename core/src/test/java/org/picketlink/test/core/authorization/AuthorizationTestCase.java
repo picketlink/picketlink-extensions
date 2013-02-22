@@ -19,14 +19,14 @@
 package org.picketlink.test.core.authorization;
 
 import javax.inject.Inject;
-
-import org.apache.deltaspike.security.api.authorization.AccessDeniedException;
+ 
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.junit.Test;
 import org.picketlink.extensions.core.pbox.authorization.RolesAllowed;
 import org.picketlink.test.core.arquillian.ArchiveUtil;
 import org.picketlink.test.core.authentication.AbstractAuthenticationTestCase;
+import org.picketlink.deltaspike.security.api.authorization.AccessDeniedException;
 
 /**
  * <p>
