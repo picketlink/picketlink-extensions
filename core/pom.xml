@@ -122,7 +122,6 @@
                 </dependency>
 
 		<!-- Apache DeltaSpike 
-                -->
 		<dependency>
 			<groupId>org.apache.deltaspike.core</groupId>
 			<artifactId>deltaspike-core-api</artifactId>
@@ -140,6 +139,7 @@
 			<artifactId>deltaspike-security-module-impl</artifactId>
 		</dependency>
 
+                -->
 		<!-- JBoss Logging -->
 		<dependency>
 			<groupId>org.jboss.logging</groupId>

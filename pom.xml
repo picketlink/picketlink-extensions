@@ -94,6 +94,8 @@
 				<type>pom</type>
 			</dependency>
 
+                   <!--
+
 			<dependency>
 				<groupId>org.apache.deltaspike.core</groupId>
 				<artifactId>deltaspike-core-api</artifactId>
@@ -121,7 +123,7 @@
 				<version>${deltaspike.version}</version>
 				<scope>runtime</scope>
 			</dependency>
-
+                    -->
 		</dependencies>
 	</dependencyManagement>
 
