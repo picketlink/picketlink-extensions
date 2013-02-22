@@ -94,6 +94,10 @@
 			<optional>true</optional>
 		</dependency>
 		<dependency>
+			<groupId>org.picketlink</groupId>
+			<artifactId>picketlink-social</artifactId>
+		</dependency>
+		<dependency>
 			<groupId>javax.enterprise</groupId>
 			<artifactId>cdi-api</artifactId>
 			<scope>provided</scope>
@@ -110,8 +114,14 @@
 			<version>1.9.2</version>
 			<scope>provided</scope>
 		</dependency>
+
+                <dependency>
+                        <groupId>org.twitter4j</groupId>
+                        <artifactId>twitter4j-core</artifactId>
+                        <version>2.2.6</version>
+                </dependency>
+
 		<!-- Apache DeltaSpike 
-                -->
 		<dependency>
 			<groupId>org.apache.deltaspike.core</groupId>
 			<artifactId>deltaspike-core-api</artifactId>
@@ -129,6 +139,7 @@
 			<artifactId>deltaspike-security-module-impl</artifactId>
 		</dependency>
 
+                -->
 		<!-- JBoss Logging -->
 		<dependency>
 			<groupId>org.jboss.logging</groupId>
