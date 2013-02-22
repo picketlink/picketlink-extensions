@@ -19,18 +19,18 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.aerogear.todo.server.security.authc.social.openid;
+package org.picketlink.extensions.core.social.twitter;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.picketbox.core.AbstractUserCredential;
+import org.picketbox.core.authentication.credential.AbstractUserCredential;
 
-public class OpenIDCredential extends AbstractUserCredential {
+public class TwitterCredential extends AbstractUserCredential {
     private HttpServletRequest request;
     private HttpServletResponse response;
 
-    public OpenIDCredential(HttpServletRequest request, HttpServletResponse response) {
+    public TwitterCredential(HttpServletRequest request, HttpServletResponse response) {
         this.request = request;
         this.response = response;
     }

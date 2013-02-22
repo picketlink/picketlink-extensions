@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-package org.aerogear.todo.server.security.authc.social.fb;
+package org.picketlink.extensions.core.social.fb;
 
 import java.io.IOException;
 import java.security.Principal;
@@ -31,10 +31,10 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-
-import org.picketbox.core.UserCredential;
+ 
 import org.picketbox.core.authentication.AuthenticationInfo;
 import org.picketbox.core.authentication.AuthenticationResult;
+import org.picketbox.core.authentication.credential.UserCredential;
 import org.picketbox.core.authentication.impl.AbstractAuthenticationMechanism;
 import org.picketbox.core.exceptions.AuthenticationException;
 import org.picketlink.idm.IdentityManager;

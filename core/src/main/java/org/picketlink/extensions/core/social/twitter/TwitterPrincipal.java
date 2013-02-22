@@ -19,41 +19,29 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.aerogear.todo.server.security.authc.social.twitter;
+package org.picketlink.extensions.core.social.twitter;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import java.io.Serializable;
+import java.security.Principal;
 
-import org.picketbox.core.AbstractUserCredential;
+import twitter4j.User;
 
-public class TwitterCredential extends AbstractUserCredential {
-    private HttpServletRequest request;
-    private HttpServletResponse response;
+/**
+ * Represents a {@link Principal} via Twitter login
+ * @author anil saldhana
+ * @since Oct 3, 2012
+ */
+public class TwitterPrincipal implements Principal, Serializable {
 
-    public TwitterCredential(HttpServletRequest request, HttpServletResponse response) {
-        this.request = request;
-        this.response = response;
+    private static final long serialVersionUID = 1L;
+
+    private String name;
+    
+    public TwitterPrincipal(User user){
+        name = user.getName();
     }
-
-    /**
-     * @return the request
-     */
-    public HttpServletRequest getRequest() {
-        return request;
-    }
-
-    /**
-     * @param request the request to set
-     */
-    public void setRequest(HttpServletRequest request) {
-        this.request = request;
-    }
-
-    public HttpServletResponse getResponse() {
-        return this.response;
-    }
-
-    public void setResponse(HttpServletResponse response) {
-        this.response = response;
+    @Override
+    public String getName() {
+        return name;
     }
 }
